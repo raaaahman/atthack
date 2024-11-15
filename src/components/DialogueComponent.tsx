@@ -1,12 +1,13 @@
-import { useVariableStorage } from "@/contexts/VariableStorageContext";
-import { Immutable } from "@/types/Immutable";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSnapshot } from "valtio";
 import YarnBound, { OptionsResult, TextResult } from "yarn-bound";
-import { PLAYER_ID } from "../constants";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
+
+import { PLAYER_ID } from "../constants";
 import { Avatar } from "./Avatar";
+import { Immutable } from "@/types/Immutable";
+import { useVariableStorage } from "@/contexts/VariableStorageContext";
 
 interface DialogueComponentProps {
   state: YarnBound;
@@ -14,23 +15,6 @@ interface DialogueComponentProps {
 
 export function DialogueComponent({ state }: DialogueComponentProps) {
   const snap = useSnapshot(state);
-
-  // autorun
-  useEffect(() => {
-    if (
-      snap.currentResult &&
-      !("options" in snap.currentResult) &&
-      !("command" in snap.currentResult) &&
-      !snap.currentResult.isDialogueEnd
-    ) {
-      const timeout = setTimeout(() => {
-        state.advance();
-        clearTimeout(timeout);
-      }, 500);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [state, snap.currentResult]);
 
   return (
     <div className="flex-grow flex flex-col justify-between px-4 bg-neutral-300">

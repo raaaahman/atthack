@@ -4,8 +4,10 @@ import { IVariablesStorage } from "yarn-bound";
 
 import { Navbar } from "../components/Navbar";
 import { IProject } from "../types/IProject";
+import { LocalStorageManager } from "@/service/LocalStorageManager";
 
 interface RootContext {
+  storage: LocalStorageManager;
   project: IProject | null;
   variables: IVariablesStorage;
 }

@@ -3,8 +3,6 @@ import { loadDialogue } from "@/queries/loadDialogue";
 
 export const Route = createFileRoute("/contacts/$contactId")({
   loader: ({ context, params }) =>
-    loadDialogue(`scripts/contact-${params.contactId}.yarn`, {
-      variableStorage: context.variables,
-    }),
+    loadDialogue(context, `scripts/contact-${params.contactId}.yarn`),
   staleTime: Infinity,
 });

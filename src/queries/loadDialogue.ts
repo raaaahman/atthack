@@ -1,23 +1,36 @@
-import YarnBound, { YarnBoundOptions } from "yarn-bound";
+import { DialogueRunner } from "@/service/DialogueRunner";
+import { LocalStorageManager } from "@/service/LocalStorageManager";
+import { IProject } from "@/types/IProject";
 
 export async function loadDialogue(
-  path: string,
-  options: Omit<YarnBoundOptions, "dialogue">
+  context: {
+    storage: LocalStorageManager;
+    project: IProject | null;
+    variables: import("yarn-bound").IVariablesStorage;
+  },
+  pathname: string
 ) {
-  const script = await fetch(path).then((response) => response.text());
+  const serialized = context.storage.getItem(pathname);
 
-  const dialogue = new YarnBound({
-    ...options,
-    dialogue: script,
-  });
+  let runner: DialogueRunner | null = null;
+  if (serialized) {
+    runner = DialogueRunner.fromJSON(serialized, {
+      variableStorage: context.variables,
+    });
+  } else {
+    const script = await fetch(pathname).then((response) => response.text());
 
-  if (!dialogue.currentResult)
-    throw new Error("The dialogue has not correctly been loaded.");
+    runner = new DialogueRunner({
+      variableStorage: context.variables,
+      dialogue: script,
+      autoRun: 400,
+    });
 
-  // set all the needed variables
-  if ("command" in dialogue.currentResult) {
-    dialogue.advance();
+    if (!runner.currentResult)
+      throw new Error("The dialogue has not correctly been loaded.");
+
+    context.storage.setItem(pathname, runner);
   }
 
-  return dialogue;
+  return runner;
 }
