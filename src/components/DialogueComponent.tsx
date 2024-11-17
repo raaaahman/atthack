@@ -126,6 +126,7 @@ function ChatInput({ result, advance }: ChatInputProps) {
             className="input input-bordered input-primary w-full max-w-lg"
             placeholder="Type here."
             onChange={(event) => {
+              console.log(event.target.value.length);
               setIsValidInput(event.target.value.length >= 1);
             }}
           />
@@ -173,7 +174,7 @@ function ChatInput({ result, advance }: ChatInputProps) {
         type="submit"
         className={clsx(
           "btn btn-circle size-12",
-          result && "options" in result ? "btn-primary" : "btn-disabled"
+          isValidInput ? "btn-primary" : "btn-disabled"
         )}
         disabled={!isValidInput}
       >
