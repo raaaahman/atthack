@@ -48,6 +48,7 @@ export function DialogueComponent({ state }: DialogueComponentProps) {
         ) : null}
       </ul>
       <ChatInput
+        key={"input-" + snap.history.length}
         result={snap.currentResult}
         advance={state.advance.bind(state)}
       />
@@ -126,7 +127,6 @@ function ChatInput({ result, advance }: ChatInputProps) {
             className="input input-bordered input-primary w-full max-w-lg"
             placeholder="Type here."
             onChange={(event) => {
-              console.log(event.target.value.length);
               setIsValidInput(event.target.value.length >= 1);
             }}
           />
