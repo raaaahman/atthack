@@ -1,4 +1,5 @@
 import { RouterProvider } from "@tanstack/react-router";
+import YarnBound from "yarn-bound";
 
 import { router } from "@/router";
 import { useEffect, useRef, useState } from "react";
@@ -6,21 +7,39 @@ import { loadProject } from "@/queries/loadProject";
 import { ProjectContext } from "@/contexts/ProjectContext";
 import { IProject } from "@/types/IProject";
 import { VariableStorageContext } from "@/contexts/VariableStorageContext";
+import { loadDialogue } from "./queries/loadDialogue";
+import { DialogueContext } from "./contexts/DialogueContext";
 
 export function App() {
   const [status, setStatus] = useState<"pending" | "error" | "success">(
     "pending"
   );
-  const [project, setProject] = useState<IProject>();
+  const [project, setProject] = useState<IProject | null>(null);
   const variables = useRef(new Map());
+  const [dialogue, setDialogue] = useState<YarnBound | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
 
     loadProject(controller.signal)
       .then((data) => {
-        setStatus("success");
         setProject(data);
+
+        return data;
+      })
+      .then((project) =>
+        loadDialogue(
+          project.sourceScripts[0],
+          {
+            variableStorage: variables.current,
+            combineTextAndOptionsResults: true,
+          },
+          controller.signal
+        )
+      )
+      .then((dialogue) => {
+        setDialogue(dialogue);
+        setStatus("success");
       })
       .catch((error) => {
         if (error.name !== "AbortError") setStatus("error");
@@ -29,7 +48,7 @@ export function App() {
     return () => controller.abort();
   }, []);
 
-  const context = { project, variables: variables.current };
+  const context = { project, variables: variables.current, dialogue };
 
   return (
     <>
@@ -38,10 +57,12 @@ export function App() {
           <span className="loading-spinner"></span>
         </div>
       ) : null}
-      {status === "success" && project ? (
+      {status === "success" ? (
         <ProjectContext.Provider value={project}>
           <VariableStorageContext.Provider value={variables.current}>
-            <RouterProvider router={router} context={context} />
+            <DialogueContext.Provider value={dialogue}>
+              <RouterProvider router={router} context={context} />
+            </DialogueContext.Provider>
           </VariableStorageContext.Provider>
         </ProjectContext.Provider>
       ) : null}
