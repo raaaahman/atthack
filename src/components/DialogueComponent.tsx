@@ -9,10 +9,11 @@ import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "./Avatar";
 
 interface DialogueComponentProps {
-  state: YarnBound;
+  state: Pick<YarnBound, "history" | "currentResult">;
+  advance: YarnBound["advance"];
 }
 
-export function DialogueComponent({ state }: DialogueComponentProps) {
+export function DialogueComponent({ state, advance }: DialogueComponentProps) {
   const snap = useSnapshot(state);
 
   // autorun
@@ -24,13 +25,13 @@ export function DialogueComponent({ state }: DialogueComponentProps) {
       !snap.currentResult.isDialogueEnd
     ) {
       const timeout = setTimeout(() => {
-        state.advance();
+        advance();
         clearTimeout(timeout);
       }, 500);
 
       return () => clearTimeout(timeout);
     }
-  }, [state, snap.currentResult]);
+  }, [advance, snap.currentResult]);
 
   return (
     <div className="flex-grow flex flex-col justify-between px-4 bg-neutral-300">
@@ -50,7 +51,7 @@ export function DialogueComponent({ state }: DialogueComponentProps) {
       <ChatInput
         key={"input-" + snap.history.length}
         result={snap.currentResult}
-        advance={state.advance.bind(state)}
+        advance={advance}
       />
     </div>
   );
@@ -160,7 +161,7 @@ function ChatInput({ result, advance }: ChatInputProps) {
             ? result.options.map((option, index) => (
                 <option
                   className={clsx(option.isAvailable ? "" : "hidden")}
-                  key={result.text || "" + index}
+                  key={option.text}
                   value={index}
                   disabled={!option.isAvailable}
                 >
