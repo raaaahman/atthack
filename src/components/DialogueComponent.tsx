@@ -1,19 +1,21 @@
-import { useVariableStorage } from "@/contexts/VariableStorageContext";
-import { Immutable } from "@/types/Immutable";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
 import YarnBound, { OptionsResult, TextResult } from "yarn-bound";
-import { PLAYER_ID } from "../constants";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
-import { Avatar } from "./Avatar";
+
+import { Immutable } from "@/types/Immutable";
+import { PLAYER_ID } from "@/constants";
+import { Avatar } from "@/components/Avatar";
+import { useDialogue } from "@/contexts/DialogueContext";
+import { useVariableStorage } from "@/contexts/VariableStorageContext";
 
 interface DialogueComponentProps {
-  state: Pick<YarnBound, "history" | "currentResult">;
-  advance: YarnBound["advance"];
+  screen: string;
 }
 
-export function DialogueComponent({ state, advance }: DialogueComponentProps) {
+export function DialogueComponent({ screen }: DialogueComponentProps) {
+  const { state, advance } = useDialogue({ screen });
   const snap = useSnapshot(state);
 
   // autorun
