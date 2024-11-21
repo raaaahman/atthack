@@ -1,14 +1,13 @@
 import { RouterProvider } from "@tanstack/react-router";
 import YarnBound from "yarn-bound";
+import { useEffect, useRef, useState } from "react";
 
 import { router } from "@/router";
-import { useEffect, useRef, useState } from "react";
 import { loadProject } from "@/queries/loadProject";
 import { ProjectContext } from "@/contexts/ProjectContext";
 import { IProject } from "@/types/IProject";
 import { VariableStorageContext } from "@/contexts/VariableStorageContext";
-import { loadDialogue } from "./queries/loadDialogue";
-import { DialogueContext } from "./contexts/DialogueContext";
+import { DialogueContext } from "@/contexts/DialogueContext";
 
 export function App() {
   const [status, setStatus] = useState<"pending" | "error" | "success">(
@@ -28,20 +27,30 @@ export function App() {
         return data;
       })
       .then((project) =>
-        loadDialogue(
-          project.sourceScripts[0],
-          {
-            variableStorage: variables.current,
-            combineTextAndOptionsResults: true,
-          },
-          controller.signal
+        Promise.all(
+          project.sourceScripts.map((path) =>
+            fetch(path, { signal: controller.signal }).then((response) =>
+              response.text()
+            )
+          )
         )
       )
-      .then((dialogue) => {
+      .then((scripts) => {
+        const dialogue = new YarnBound({
+          dialogue: scripts[0],
+          variableStorage: variables.current,
+          combineTextAndOptionsResults: true,
+        });
+        for (let i = 1; i < scripts.length; i++) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          dialogue.runner.load(scripts[i]);
+        }
         setDialogue(dialogue);
         setStatus("success");
       })
       .catch((error) => {
+        console.log(error);
         if (error.name !== "AbortError") setStatus("error");
       });
 
