@@ -1,18 +1,21 @@
-import { useVariableStorage } from "@/contexts/VariableStorageContext";
-import { Immutable } from "@/types/Immutable";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
 import YarnBound, { OptionsResult, TextResult } from "yarn-bound";
-import { PLAYER_ID } from "../constants";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
-import { Avatar } from "./Avatar";
+
+import { Immutable } from "@/types/Immutable";
+import { PLAYER_ID } from "@/constants";
+import { Avatar } from "@/components/Avatar";
+import { useVariableStorage } from "@/contexts/VariableStorageContext";
+import { useCharacters } from "@/contexts/CharactersContext";
 
 interface DialogueComponentProps {
-  state: YarnBound;
+  state: Pick<YarnBound, "history" | "currentResult">;
+  advance: YarnBound["advance"];
 }
 
-export function DialogueComponent({ state }: DialogueComponentProps) {
+export function DialogueComponent({ state, advance }: DialogueComponentProps) {
   const snap = useSnapshot(state);
 
   // autorun
@@ -24,22 +27,24 @@ export function DialogueComponent({ state }: DialogueComponentProps) {
       !snap.currentResult.isDialogueEnd
     ) {
       const timeout = setTimeout(() => {
-        state.advance();
+        advance();
         clearTimeout(timeout);
       }, 500);
 
       return () => clearTimeout(timeout);
     }
-  }, [state, snap.currentResult]);
+  }, [advance, snap.currentResult]);
 
   return (
     <div className="flex-grow flex flex-col justify-between px-4 bg-neutral-300">
       <ul className="overflow-y-scroll">
-        {snap.history
-          .filter((result) => "text" in result)
-          .map((result) => (
-            <ChatMessage key={result.text} result={result} />
-          ))}
+        {(
+          snap.history.filter((result) => "text" in result) as Immutable<
+            OptionsResult | TextResult
+          >[]
+        ).map((result) => (
+          <ChatMessage key={result.text} result={result} />
+        ))}
         {snap.currentResult && "text" in snap.currentResult ? (
           <ChatMessage
             key={snap.currentResult.text}
@@ -50,7 +55,7 @@ export function DialogueComponent({ state }: DialogueComponentProps) {
       <ChatInput
         key={"input-" + snap.history.length}
         result={snap.currentResult}
-        advance={state.advance.bind(state)}
+        advance={advance}
       />
     </div>
   );
@@ -65,9 +70,7 @@ function ChatMessage({ result }: ChatMessageProps) {
     ?.find((tag) => tag.name === "character")
     ?.properties.name.toLowerCase();
 
-  const variables = useVariableStorage();
-
-  const characterName = variables.get(`${characterId}_name`);
+  const characters = useCharacters();
 
   return (
     <li
@@ -77,7 +80,9 @@ function ChatMessage({ result }: ChatMessageProps) {
       )}
     >
       {characterId ? <Avatar characterId={characterId} /> : null}
-      <div className="chat-header">{characterName}</div>
+      {characterId ? (
+        <div className="chat-header">{characters.getName(characterId)}</div>
+      ) : null}
       <div
         className={clsx(
           "chat-bubble",
@@ -160,7 +165,7 @@ function ChatInput({ result, advance }: ChatInputProps) {
             ? result.options.map((option, index) => (
                 <option
                   className={clsx(option.isAvailable ? "" : "hidden")}
-                  key={result.text || "" + index}
+                  key={option.text}
                   value={index}
                   disabled={!option.isAvailable}
                 >

@@ -1,23 +1,21 @@
-import { createLazyFileRoute, useLoaderData } from "@tanstack/react-router";
-import { useRef } from "react";
-import { proxy } from "valtio";
+import { createLazyFileRoute } from "@tanstack/react-router";
 
 import { DialogueComponent } from "@/components/DialogueComponent";
+import { useDialogue } from "@/contexts/DialogueContext";
 
 export const Route = createLazyFileRoute("/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const dialogue = useLoaderData({ from: "/" });
-  const state = useRef(proxy(dialogue)).current;
+  const { state, advance } = useDialogue({ screen: "home" });
 
   return (
     <>
       <h1 className="text-2xl font-bold text-center shadow-sm p-4 bg-neutral-100">
         Home
       </h1>
-      <DialogueComponent state={state} />
+      <DialogueComponent state={state} advance={advance} />
     </>
   );
 }

@@ -1,12 +1,8 @@
-import {
-  createLazyFileRoute,
-  useLoaderData,
-  useParams,
-} from "@tanstack/react-router";
-import { useRef } from "react";
-import { proxy } from "valtio";
+import { createLazyFileRoute, useParams } from "@tanstack/react-router";
 import { DialogueComponent } from "../../components/DialogueComponent";
-import { useVariableStorage } from "@/contexts/VariableStorageContext";
+import { SCREEN_PREFIX } from "./-constants";
+import { useCharacters } from "@/contexts/CharactersContext";
+import { useDialogue } from "@/contexts/DialogueContext";
 
 export const Route = createLazyFileRoute("/contacts/$contactId")({
   component: RouteComponent,
@@ -14,21 +10,16 @@ export const Route = createLazyFileRoute("/contacts/$contactId")({
 
 function RouteComponent() {
   const { contactId } = useParams({ from: "/contacts/$contactId" });
-  const dialogue = useLoaderData({ from: "/contacts/$contactId" });
-
-  const state = useRef(proxy(dialogue)).current;
-
-  const variables = useVariableStorage();
+  const { state, advance } = useDialogue({ screen: SCREEN_PREFIX + contactId });
+  const characters = useCharacters();
 
   return (
     <>
       <h1 className="p-4 text-lg shadow-sm">
         Your conversation with{" "}
-        <span className="font-semibold">
-          {variables.get(`${contactId}_name`)}
-        </span>
+        <span className="font-semibold">{characters.getName(contactId)}</span>
       </h1>
-      <DialogueComponent state={state} />
+      <DialogueComponent state={state} advance={advance} />
     </>
   );
 }

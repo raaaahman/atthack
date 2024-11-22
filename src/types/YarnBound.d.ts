@@ -73,19 +73,25 @@ declare module "yarn-bound" {
     locale?: string;
   };
 
+  type GeneratedResult = (TextResult | OptionsResult | CommandResult) & {
+    getGeneratorHere: () => Generator<GeneratedResult>;
+  };
+
   class YarnBound {
     handleCommand?: HandleCommandFn;
     pauseCommand: string = "pause";
     combineTextAndOptionsResults?: boolean;
     currentResult: TextResult | OptionsResult | CommandResult | null;
-    history: (TextResult | OptionResult | CommandResult)[];
+    history: (TextResult | OptionsResult | CommandResult)[];
     locale?: string;
     variableStorage: IVariablesStorage;
+    generator: Generator<GeneratedResult>;
 
     constructor(options: YarnBoundOptions);
-    jump: (startAt: string) => void;
-    advance: (optionIndex?: number) => void;
+    jump(startAt: string): void;
+    advance(optionIndex?: number): void;
     currentResult: OptionsResult | TextResult | CommandResult | undefined;
+    lookahead(): IteratorResult<GeneratedResult>;
   }
 
   export default YarnBound;

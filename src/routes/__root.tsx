@@ -1,13 +1,16 @@
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { IVariablesStorage } from "yarn-bound";
+import YarnBound, { IVariablesStorage } from "yarn-bound";
 
-import { Navbar } from "../components/Navbar";
-import { IProject } from "../types/IProject";
+import { Navbar } from "@/components/Navbar";
+import { IProject } from "@/types/IProject";
+import { CharactersRegistry } from "@/service/CharactersRegistry";
 
 interface RootContext {
   project: IProject | null;
   variables: IVariablesStorage;
+  dialogue: YarnBound | null;
+  characters: CharactersRegistry;
 }
 
 export const Route = createRootRouteWithContext<RootContext>()({

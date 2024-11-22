@@ -8,16 +8,21 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
 import { Route as ContactsIndexImport } from './routes/contacts/index'
-import { Route as ContactsContactIdImport } from './routes/contacts/$contactId'
+
+// Create Virtual Routes
+
+const IndexLazyImport = createFileRoute('/')()
+const ContactsContactIdLazyImport = createFileRoute('/contacts/$contactId')()
 
 // Create/Update Routes
 
-const IndexRoute = IndexImport.update({
+const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
@@ -31,7 +36,7 @@ const ContactsIndexRoute = ContactsIndexImport.update({
   import('./routes/contacts/index.lazy').then((d) => d.Route),
 )
 
-const ContactsContactIdRoute = ContactsContactIdImport.update({
+const ContactsContactIdLazyRoute = ContactsContactIdLazyImport.update({
   id: '/contacts/$contactId',
   path: '/contacts/$contactId',
   getParentRoute: () => rootRoute,
@@ -47,14 +52,14 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexImport
+      preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
     '/contacts/$contactId': {
       id: '/contacts/$contactId'
       path: '/contacts/$contactId'
       fullPath: '/contacts/$contactId'
-      preLoaderRoute: typeof ContactsContactIdImport
+      preLoaderRoute: typeof ContactsContactIdLazyImport
       parentRoute: typeof rootRoute
     }
     '/contacts/': {
@@ -70,21 +75,21 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/contacts/$contactId': typeof ContactsContactIdRoute
+  '/': typeof IndexLazyRoute
+  '/contacts/$contactId': typeof ContactsContactIdLazyRoute
   '/contacts': typeof ContactsIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/contacts/$contactId': typeof ContactsContactIdRoute
+  '/': typeof IndexLazyRoute
+  '/contacts/$contactId': typeof ContactsContactIdLazyRoute
   '/contacts': typeof ContactsIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/contacts/$contactId': typeof ContactsContactIdRoute
+  '/': typeof IndexLazyRoute
+  '/contacts/$contactId': typeof ContactsContactIdLazyRoute
   '/contacts/': typeof ContactsIndexRoute
 }
 
@@ -98,14 +103,14 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ContactsContactIdRoute: typeof ContactsContactIdRoute
+  IndexLazyRoute: typeof IndexLazyRoute
+  ContactsContactIdLazyRoute: typeof ContactsContactIdLazyRoute
   ContactsIndexRoute: typeof ContactsIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ContactsContactIdRoute: ContactsContactIdRoute,
+  IndexLazyRoute: IndexLazyRoute,
+  ContactsContactIdLazyRoute: ContactsContactIdLazyRoute,
   ContactsIndexRoute: ContactsIndexRoute,
 }
 
@@ -125,10 +130,10 @@ export const routeTree = rootRoute
       ]
     },
     "/": {
-      "filePath": "index.tsx"
+      "filePath": "index.lazy.tsx"
     },
     "/contacts/$contactId": {
-      "filePath": "contacts/$contactId.tsx"
+      "filePath": "contacts/$contactId.lazy.tsx"
     },
     "/contacts/": {
       "filePath": "contacts/index.tsx"
