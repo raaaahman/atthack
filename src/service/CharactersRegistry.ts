@@ -23,7 +23,11 @@ export class CharactersRegistry {
   }
 
   getName(characterId: string) {
-    return this._variables.get(`${characterId}_name`);
+    const name = this._variables.get(`${characterId}_name`);
+
+    return typeof name === "string"
+      ? name[0].toUpperCase() + name.slice(1)
+      : "???";
   }
 
   async getAvatar(characterId: string) {
