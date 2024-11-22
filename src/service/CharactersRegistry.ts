@@ -13,6 +13,8 @@ type Request = {
   controller: AbortController;
 };
 
+const ROLE_NAMES = ["SuperAdmin", "Admin", "Teacher", "Student", "Guest"];
+
 export class CharactersRegistry {
   _variables: IVariablesStorage;
   _avatars = new Map<string, ReturnType<typeof createAvatar>>();
@@ -41,6 +43,15 @@ export class CharactersRegistry {
         return undefined;
       }
     }
+  }
+
+  getRole(characterId: string) {
+    const variableName = `${characterId}_role`;
+    const value = this._variables.get(variableName);
+
+    return typeof value === "number" && value < ROLE_NAMES.length
+      ? ROLE_NAMES[value]
+      : "Guest";
   }
 
   async preload(characterId: string) {

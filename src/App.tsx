@@ -60,7 +60,12 @@ export function App() {
     return () => controller.abort();
   }, []);
 
-  const context = { project, variables: variables.current, dialogue };
+  const context = {
+    project,
+    variables: variables.current,
+    dialogue,
+    characters: characters.current,
+  };
 
   return (
     <>

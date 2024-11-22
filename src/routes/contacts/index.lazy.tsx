@@ -1,20 +1,18 @@
-import { Avatar } from "@/components/Avatar";
-import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
 import {
   createLazyFileRoute,
   Link,
   useLoaderData,
 } from "@tanstack/react-router";
+import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
+
+import { Avatar } from "@/components/Avatar";
 
 export const Route = createLazyFileRoute("/contacts/")({
   component: RouteComponent,
 });
 
-const ROLE_NAMES = ["SuperAdmin", "Admin", "Teacher", "Student", "Guest"];
-
 function RouteComponent() {
   const data = useLoaderData({ from: "/contacts/" });
-
   return (
     <>
       <h1 className="text-2xl font-bold text-center p-2 shadow-sm bg-neutral-100">
@@ -29,7 +27,7 @@ function RouteComponent() {
             <Avatar characterId={id} />
             <div className="flex-grow text-start px-1">
               <p className="font-semibold">{name}</p>
-              <p className="font-light">{ROLE_NAMES[role]}</p>
+              <p className="font-light">{role}</p>
             </div>
             <Link
               to={`/contacts/${id}`}

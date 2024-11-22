@@ -5,7 +5,7 @@ import { CommandResult, OptionsResult, TextResult } from "yarn-bound";
 type Contact = {
   id: string;
   name: string;
-  role: number;
+  role: string;
 };
 
 export const Route = createFileRoute("/contacts/")({
@@ -31,8 +31,8 @@ export const Route = createFileRoute("/contacts/")({
             const id = result.metadata.screen.slice(SCREEN_PREFIX.length);
             return {
               id,
-              name: id[0] + id.slice(1),
-              role: 3,
+              name: context.characters.getName(id),
+              role: context.characters.getRole(id),
             };
           }) || [];
 
