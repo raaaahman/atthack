@@ -10,7 +10,7 @@ export const Route = createLazyFileRoute("/contacts/")({
   component: RouteComponent,
 });
 
-const ROLE_NAMES = ["SuperAdmin", "Admin", "Teacher", "Student"];
+const ROLE_NAMES = ["SuperAdmin", "Admin", "Teacher", "Student", "Guest"];
 
 function RouteComponent() {
   const data = useLoaderData({ from: "/contacts/" });

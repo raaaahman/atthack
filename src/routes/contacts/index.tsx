@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SCREEN_PREFIX } from "./-constants";
+import { CommandResult, OptionsResult, TextResult } from "yarn-bound";
 
 type Contact = {
   id: string;
@@ -9,25 +11,32 @@ type Contact = {
 export const Route = createFileRoute("/contacts/")({
   loader: ({ context }) =>
     new Promise<Contact[]>((resolve, reject) => {
-      if (!context.project)
-        return reject("The project has not been correctly initialized.");
+      if (!context.dialogue)
+        return reject("The dialogue has not been correctly initialized.");
 
-      const contacts = context.project.sourceScripts.reduce((names, path) => {
-        const matches = path.match(/\/contact-(.*)\.yarn$/);
-
-        if (!matches) return names;
-
-        if (context.variables.get(`${matches[1]}_contact`))
-          names.push({
-            id: matches[1],
-            name:
-              context.variables.get(`${matches[1]}_name`)?.toString() || "???",
-            role: Number(context.variables.get(`${matches[1]}_role`)),
-          });
-
-        return names;
-      }, [] as Contact[]);
+      const contacts =
+        context.dialogue?.history
+          .concat(context.dialogue.currentResult || [])
+          .reduce(
+            (results, result) =>
+              result.metadata.screen?.startsWith(SCREEN_PREFIX) &&
+              !results.find(
+                (current) => current.metadata.screen === result.metadata.screen
+              )
+                ? results.concat(result)
+                : results,
+            [] as (TextResult | CommandResult | OptionsResult)[]
+          )
+          .map((result) => {
+            const id = result.metadata.screen.slice(SCREEN_PREFIX.length);
+            return {
+              id,
+              name: id[0] + id.slice(1),
+              role: 3,
+            };
+          }) || [];
 
       return resolve(contacts);
     }),
 });
+
