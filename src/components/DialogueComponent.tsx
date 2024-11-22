@@ -38,11 +38,13 @@ export function DialogueComponent({ screen }: DialogueComponentProps) {
   return (
     <div className="flex-grow flex flex-col justify-between px-4 bg-neutral-300">
       <ul className="overflow-y-scroll">
-        {snap.history
-          .filter((result) => "text" in result)
-          .map((result) => (
-            <ChatMessage key={result.text} result={result} />
-          ))}
+        {(
+          snap.history.filter((result) => "text" in result) as Immutable<
+            OptionsResult | TextResult
+          >[]
+        ).map((result) => (
+          <ChatMessage key={result.text} result={result} />
+        ))}
         {snap.currentResult && "text" in snap.currentResult ? (
           <ChatMessage
             key={snap.currentResult.text}
