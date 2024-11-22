@@ -9,6 +9,7 @@ import { PLAYER_ID } from "@/constants";
 import { Avatar } from "@/components/Avatar";
 import { useDialogue } from "@/contexts/DialogueContext";
 import { useVariableStorage } from "@/contexts/VariableStorageContext";
+import { useCharacters } from "@/contexts/CharactersContext";
 
 interface DialogueComponentProps {
   screen: string;
@@ -70,9 +71,7 @@ function ChatMessage({ result }: ChatMessageProps) {
     ?.find((tag) => tag.name === "character")
     ?.properties.name.toLowerCase();
 
-  const variables = useVariableStorage();
-
-  const characterName = variables.get(`${characterId}_name`);
+  const characters = useCharacters();
 
   return (
     <li
@@ -82,7 +81,9 @@ function ChatMessage({ result }: ChatMessageProps) {
       )}
     >
       {characterId ? <Avatar characterId={characterId} /> : null}
-      <div className="chat-header">{characterName}</div>
+      {characterId ? (
+        <div className="chat-header">{characters.getName(characterId)}</div>
+      ) : null}
       <div
         className={clsx(
           "chat-bubble",

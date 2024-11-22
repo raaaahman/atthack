@@ -8,6 +8,8 @@ import { ProjectContext } from "@/contexts/ProjectContext";
 import { IProject } from "@/types/IProject";
 import { VariableStorageContext } from "@/contexts/VariableStorageContext";
 import { DialogueContext } from "@/contexts/DialogueContext";
+import { CharactersContext } from "./contexts/CharactersContext";
+import { CharactersRegistry } from "./service/CharactersRegistry";
 
 export function App() {
   const [status, setStatus] = useState<"pending" | "error" | "success">(
@@ -16,6 +18,7 @@ export function App() {
   const [project, setProject] = useState<IProject | null>(null);
   const variables = useRef(new Map());
   const [dialogue, setDialogue] = useState<YarnBound | null>(null);
+  const characters = useRef(new CharactersRegistry(variables.current));
 
   useEffect(() => {
     const controller = new AbortController();
@@ -69,9 +72,11 @@ export function App() {
       {status === "success" ? (
         <ProjectContext.Provider value={project}>
           <VariableStorageContext.Provider value={variables.current}>
-            <DialogueContext.Provider value={dialogue}>
-              <RouterProvider router={router} context={context} />
-            </DialogueContext.Provider>
+            <CharactersContext.Provider value={characters.current}>
+              <DialogueContext.Provider value={dialogue}>
+                <RouterProvider router={router} context={context} />
+              </DialogueContext.Provider>
+            </CharactersContext.Provider>
           </VariableStorageContext.Provider>
         </ProjectContext.Provider>
       ) : null}

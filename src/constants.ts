@@ -1,1 +1,1 @@
-export const PLAYER_ID = "character1";
+export const PLAYER_ID = "pulse";
