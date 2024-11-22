@@ -2,6 +2,7 @@ import { createLazyFileRoute, useParams } from "@tanstack/react-router";
 import { DialogueComponent } from "../../components/DialogueComponent";
 import { SCREEN_PREFIX } from "./-constants";
 import { useCharacters } from "@/contexts/CharactersContext";
+import { useDialogue } from "@/contexts/DialogueContext";
 
 export const Route = createLazyFileRoute("/contacts/$contactId")({
   component: RouteComponent,
@@ -9,6 +10,7 @@ export const Route = createLazyFileRoute("/contacts/$contactId")({
 
 function RouteComponent() {
   const { contactId } = useParams({ from: "/contacts/$contactId" });
+  const { state, advance } = useDialogue({ screen: SCREEN_PREFIX + contactId });
   const characters = useCharacters();
 
   return (
@@ -17,7 +19,7 @@ function RouteComponent() {
         Your conversation with{" "}
         <span className="font-semibold">{characters.getName(contactId)}</span>
       </h1>
-      <DialogueComponent screen={SCREEN_PREFIX + contactId} />
+      <DialogueComponent state={state} advance={advance} />
     </>
   );
 }

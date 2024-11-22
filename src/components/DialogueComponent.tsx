@@ -7,16 +7,15 @@ import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import { Immutable } from "@/types/Immutable";
 import { PLAYER_ID } from "@/constants";
 import { Avatar } from "@/components/Avatar";
-import { useDialogue } from "@/contexts/DialogueContext";
 import { useVariableStorage } from "@/contexts/VariableStorageContext";
 import { useCharacters } from "@/contexts/CharactersContext";
 
 interface DialogueComponentProps {
-  screen: string;
+  state: Pick<YarnBound, "history" | "currentResult">;
+  advance: YarnBound["advance"];
 }
 
-export function DialogueComponent({ screen }: DialogueComponentProps) {
-  const { state, advance } = useDialogue({ screen });
+export function DialogueComponent({ state, advance }: DialogueComponentProps) {
   const snap = useSnapshot(state);
 
   // autorun
