@@ -28,10 +28,11 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
     ) {
       const timeout = setTimeout(() => {
         advance();
-        clearTimeout(timeout);
       }, 500);
 
-      return () => clearTimeout(timeout);
+      return () => {
+        clearTimeout(timeout);
+      };
     }
   }, [advance, snap.currentResult]);
 
@@ -42,18 +43,20 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
           snap.history.filter((result) => "text" in result) as Immutable<
             OptionsResult | TextResult
           >[]
-        ).map((result) => (
-          <ChatMessage key={result.text} result={result} />
+        ).map((result, i) => (
+          <ChatMessage key={result.metadata.screen + "-" + i} result={result} />
         ))}
         {snap.currentResult && "text" in snap.currentResult ? (
           <ChatMessage
-            key={snap.currentResult.text}
+            key={snap.currentResult.metadata.screen + "-" + snap.history.length}
             result={snap.currentResult}
           />
         ) : null}
       </ul>
       <ChatInput
-        key={"input-" + snap.history.length}
+        key={
+          snap.currentResult?.metadata.screen + "-input-" + snap.history.length
+        }
         result={snap.currentResult}
         advance={advance}
       />
