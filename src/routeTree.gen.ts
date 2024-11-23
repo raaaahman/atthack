@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as ContactsIndexImport } from './routes/contacts/index'
+import { Route as AiIndexImport } from './routes/ai/index'
 
 // Create Virtual Routes
 
@@ -35,6 +36,12 @@ const ContactsIndexRoute = ContactsIndexImport.update({
 } as any).lazy(() =>
   import('./routes/contacts/index.lazy').then((d) => d.Route),
 )
+
+const AiIndexRoute = AiIndexImport.update({
+  id: '/ai/',
+  path: '/ai/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/ai/index.lazy').then((d) => d.Route))
 
 const ContactsContactIdLazyRoute = ContactsContactIdLazyImport.update({
   id: '/contacts/$contactId',
@@ -62,6 +69,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactsContactIdLazyImport
       parentRoute: typeof rootRoute
     }
+    '/ai/': {
+      id: '/ai/'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AiIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/contacts/': {
       id: '/contacts/'
       path: '/contacts'
@@ -77,12 +91,14 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/contacts/$contactId': typeof ContactsContactIdLazyRoute
+  '/ai': typeof AiIndexRoute
   '/contacts': typeof ContactsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/contacts/$contactId': typeof ContactsContactIdLazyRoute
+  '/ai': typeof AiIndexRoute
   '/contacts': typeof ContactsIndexRoute
 }
 
@@ -90,27 +106,30 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/contacts/$contactId': typeof ContactsContactIdLazyRoute
+  '/ai/': typeof AiIndexRoute
   '/contacts/': typeof ContactsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contacts/$contactId' | '/contacts'
+  fullPaths: '/' | '/contacts/$contactId' | '/ai' | '/contacts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contacts/$contactId' | '/contacts'
-  id: '__root__' | '/' | '/contacts/$contactId' | '/contacts/'
+  to: '/' | '/contacts/$contactId' | '/ai' | '/contacts'
+  id: '__root__' | '/' | '/contacts/$contactId' | '/ai/' | '/contacts/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   ContactsContactIdLazyRoute: typeof ContactsContactIdLazyRoute
+  AiIndexRoute: typeof AiIndexRoute
   ContactsIndexRoute: typeof ContactsIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   ContactsContactIdLazyRoute: ContactsContactIdLazyRoute,
+  AiIndexRoute: AiIndexRoute,
   ContactsIndexRoute: ContactsIndexRoute,
 }
 
@@ -126,6 +145,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/contacts/$contactId",
+        "/ai/",
         "/contacts/"
       ]
     },
@@ -134,6 +154,9 @@ export const routeTree = rootRoute
     },
     "/contacts/$contactId": {
       "filePath": "contacts/$contactId.lazy.tsx"
+    },
+    "/ai/": {
+      "filePath": "ai/index.tsx"
     },
     "/contacts/": {
       "filePath": "contacts/index.tsx"
