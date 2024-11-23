@@ -1,4 +1,4 @@
-import { UserIcon } from "@heroicons/react/24/outline";
+import { SparklesIcon, UserIcon } from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@tanstack/react-router";
 import clsx from "clsx";
@@ -23,6 +23,16 @@ export const Navbar = () => {
           <span className="sr-only">Contacts</span>
           <UserIcon
             title="Contacts"
+            role="presentation"
+            className="size-8 m-2 md:size-12 md:m-4"
+          />
+        </Link>
+      </button>
+      <button className={clsx(pathname === "/ai" ? "active" : "")}>
+        <Link className="block" to="/ai">
+          <span className="sr-only">AI Assistant</span>
+          <SparklesIcon
+            title="AI Assistant"
             role="presentation"
             className="size-8 m-2 md:size-12 md:m-4"
           />
