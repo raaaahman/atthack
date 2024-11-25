@@ -1,11 +1,11 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import clsx from "clsx";
 import { OptionsResult, TextResult } from "yarn-bound";
 
 import { PLAYER_ID } from "@/constants";
 import { useCharacters } from "@/contexts/CharactersContext";
-import { Avatar } from "../Avatar";
-import MARKUP from "../markup";
+import { Avatar } from "@/components/Avatar";
+import MARKUP from "@/components/markup";
 import { Immutable } from "@/types/Immutable";
 
 interface ChatMessageProps {
@@ -32,7 +32,7 @@ export function ChatMessage({ result }: ChatMessageProps) {
       const primitive = String(current);
       currentLength += primitive.length;
 
-      if (currentLength > tag.position + tag.length) {
+      if (currentLength > tag.position) {
         const before = primitive.slice(0, tag.position - previousLength);
 
         const inner = primitive.slice(
@@ -47,9 +47,17 @@ export function ChatMessage({ result }: ChatMessageProps) {
         const Component = MARKUP[tag.name as keyof typeof MARKUP];
 
         return all.concat(
-          before,
-          Component({ ...tag.properties, children: inner }),
-          after
+          before.trim().length > 0 ? (
+            <span key={previousLength}>{before}</span>
+          ) : undefined,
+          createElement(
+            Component,
+            { ...tag.properties, key: tag.position },
+            inner
+          ),
+          after.trim().length > 0 ? (
+            <span key={tag.position + tag.length}>{after}</span>
+          ) : undefined
         );
       } else {
         return all.concat(current);

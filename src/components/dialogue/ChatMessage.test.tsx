@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
 import { PropsWithChildren } from "react";
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
 import { YarnVariableType } from "yarn-bound";
 
 import { ChatMessage } from "./ChatMessage";
@@ -30,6 +30,8 @@ const wrapper = ({ children }: PropsWithChildren<object>) => {
 };
 
 describe("The ChatMessage component", () => {
+  afterEach(cleanup);
+
   it("should return the text of a TextResult", async () => {
     render(
       <ChatMessage
@@ -98,6 +100,36 @@ describe("The ChatMessage component", () => {
 
     await screen.findByText("is");
 
-    expect(screen.getByTestId("test-b"));
+    expect(screen.getByTestId("test-b")).toHaveTextContent("is");
+  });
+
+  it("should replace markup when the tag span the whole line", async () => {
+    render(
+      <ChatMessage
+        result={{
+          text: "Don't talk to me like that!",
+          metadata: {
+            title: "Node",
+            fileTags: [],
+          },
+          hashtags: [],
+          markup: [
+            {
+              name: "b",
+              position: 0,
+              length: "Don't talk to me like that!".length,
+              properties: {},
+            },
+          ],
+        }}
+      />,
+      { wrapper }
+    );
+
+    await screen.findByText("Don't talk to me like that!");
+
+    expect(screen.getByTestId("test-b")).toHaveTextContent(
+      "Don't talk to me like that!"
+    );
   });
 });
