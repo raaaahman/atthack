@@ -1,50 +1,54 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 
 type AttachmentProps = {
-  path?: string;
+  src?: string;
 };
 
-const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "svg", "webp"];
+const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "svg", "webp", "gif"];
 
-export function Attachment({
-  path,
-  children,
-}: PropsWithChildren<AttachmentProps>) {
-  const extension = path?.match(/\.(\w+)$/);
+export function Attachment({ src, children }: PropsWithChildren<AttachmentProps>) {
+  const extension = src?.match(/\.(\w+)$/);
   const type =
     extension && IMAGE_EXTENSIONS.includes(extension[1]) ? "image" : "other";
 
   const [resource, setResource] = useState<string>();
 
   useEffect(() => {
-    if (path) {
-      const controller = new AbortController();
+    const controller = new AbortController();
 
-      fetch(path, { signal: controller.signal }).then((response) => {
-        if (type === "image") {
-          response
-            .blob()
-            .then((blob) => setResource(URL.createObjectURL(blob)));
-        }
-      });
-
-      return () => {
-        controller.abort();
-        if (resource) URL.revokeObjectURL(resource);
-      };
+    if (src && !resource) {
+      fetch(src, { signal: controller.signal })
+        .then(() => {
+          if (type === "image") {
+            setResource(src);
+          }
+        })
+        .catch((error) => {
+          if (
+            !(error instanceof Error && error.message.startsWith("AbortError"))
+          )
+            console.log(error);
+        });
     }
-  }, [path, type]);
 
-  return resource ? (
-    type === "image" ? (
+    return () => {
+      controller.abort();
+      if (resource) URL.revokeObjectURL(resource);
+    };
+  }, [src, type, resource]);
+
+  return type === "image" ? (
+    resource ? (
       <img
-        className="max-h-72 max-w-96"
+        className="h-72 w-96 rounded-md"
         alt={typeof children === "string" ? children : "An image."}
         src={resource}
       />
     ) : (
-      <div>{resource?.toString()}</div>
+      <div className="skeleton h-72 w-96" />
     )
+  ) : resource ? (
+    <div>{resource.toString()}</div>
   ) : (
     children
   );
