@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createLazyFileRoute, useLoaderData } from "@tanstack/react-router";
 
-import { DialogueComponent } from "@/components/DialogueComponent";
+import { DialogueComponent } from "@/components/dialogue/DialogueComponent";
 import { useDialogue } from "@/contexts/DialogueContext";
 import { useCharacters } from "@/contexts/CharactersContext";
 import { SCREEN_PREFIX } from "./-constants";
