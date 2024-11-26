@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 
-import { DialogueComponent } from "@/components/DialogueComponent";
+import { DialogueComponent } from "@/components/dialogue/DialogueComponent";
 import { useDialogue } from "@/contexts/DialogueContext";
 
 export const Route = createLazyFileRoute("/")({

@@ -1,5 +1,5 @@
 import { createLazyFileRoute, useParams } from "@tanstack/react-router";
-import { DialogueComponent } from "../../components/DialogueComponent";
+import { DialogueComponent } from "../../components/dialogue/DialogueComponent";
 import { SCREEN_PREFIX } from "./-constants";
 import { useCharacters } from "@/contexts/CharactersContext";
 import { useDialogue } from "@/contexts/DialogueContext";

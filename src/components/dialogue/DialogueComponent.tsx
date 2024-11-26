@@ -5,10 +5,8 @@ import YarnBound, { OptionsResult, TextResult } from "yarn-bound";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 
 import { Immutable } from "@/types/Immutable";
-import { PLAYER_ID } from "@/constants";
-import { Avatar } from "@/components/Avatar";
 import { useVariableStorage } from "@/contexts/VariableStorageContext";
-import { useCharacters } from "@/contexts/CharactersContext";
+import { ChatMessage } from "./ChatMessage";
 
 interface DialogueComponentProps {
   state: Pick<YarnBound, "history" | "currentResult">;
@@ -61,40 +59,6 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
         advance={advance}
       />
     </div>
-  );
-}
-
-interface ChatMessageProps {
-  result: Immutable<TextResult | OptionsResult>;
-}
-
-function ChatMessage({ result }: ChatMessageProps) {
-  const characterId = result.markup
-    ?.find((tag) => tag.name === "character")
-    ?.properties.name.toLowerCase();
-
-  const characters = useCharacters();
-
-  return (
-    <li
-      className={clsx(
-        "chat",
-        characterId === PLAYER_ID ? "chat-end" : "chat-start"
-      )}
-    >
-      {characterId ? <Avatar characterId={characterId} /> : null}
-      {characterId ? (
-        <div className="chat-header">{characters.getName(characterId)}</div>
-      ) : null}
-      <div
-        className={clsx(
-          "chat-bubble",
-          characterId === PLAYER_ID ? "chat-bubble-primary" : ""
-        )}
-      >
-        {result.text}
-      </div>
-    </li>
   );
 }
 

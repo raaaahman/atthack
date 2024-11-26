@@ -4,6 +4,8 @@ declare module "yarn-bound" {
     properties: {
       [key: string]: string;
     };
+    position: number;
+    length: number;
   };
 
   type CharacterTag = {
@@ -11,12 +13,14 @@ declare module "yarn-bound" {
     properties: Tag["properties"] & {
       name: string;
     };
+    position: number;
+    length: number;
   };
 
   export type NodeMetadata = {
+    [key: string]: string | string[];
     title: string;
     fileTags: string[];
-    [key: string]: string;
   };
 
   export type BaseResult = {
