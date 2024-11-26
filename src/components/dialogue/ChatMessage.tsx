@@ -13,9 +13,8 @@ interface ChatMessageProps {
 }
 
 export function ChatMessage({ result }: ChatMessageProps) {
-  const characterId = result.markup
-    ?.find((tag) => tag.name === "character")
-    ?.properties.name.toLowerCase();
+  const tag = result.markup?.find((tag) => tag.name === "character");
+  const characterId = tag?.properties.name.toLowerCase();
 
   const characters = useCharacters();
 
@@ -72,9 +71,26 @@ export function ChatMessage({ result }: ChatMessageProps) {
         characterId === PLAYER_ID ? "chat-end" : "chat-start"
       )}
     >
-      {characterId ? <Avatar characterId={characterId} /> : null}
+      {tag ? (
+        <div className="chat-image avatar">
+          {tag.properties.as ? (
+            <Avatar
+              characterId={tag.properties.as.toLocaleLowerCase()}
+              className={clsx(
+                "relative",
+                characterId === PLAYER_ID ? "-me-4" : "-ms-4"
+              )}
+            />
+          ) : null}
+          <Avatar characterId={tag.properties.name.toLocaleLowerCase()} />
+        </div>
+      ) : null}
       {characterId ? (
-        <div className="chat-header">{characters.getName(characterId)}</div>
+        <div className="chat-header">
+          {tag?.properties.as
+            ? `${tag.properties.as}  (${characters.getName(characterId)})`
+            : characters.getName(characterId)}
+        </div>
       ) : null}
       <div
         className={clsx(
