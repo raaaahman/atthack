@@ -3,6 +3,11 @@ import { IVariablesStorage } from "yarn-bound";
 
 import * as collections from "@dicebear/collection";
 
+const SPECIAL_CHARACTERS = {
+  anonymous: "incognito-circle.svg",
+  "cryptosecure support": "support-circle.svg",
+};
+
 type AvatarData = {
   collection: keyof typeof collections;
   options: Record<string, string | number | boolean>;
@@ -56,16 +61,37 @@ export class CharactersRegistry {
 
   async preload(characterId: string) {
     const controller = new AbortController();
-    const path = `/avatars/${characterId}.json`;
+
+    const isSpecialCharacter =
+      Object.getOwnPropertyNames(SPECIAL_CHARACTERS).includes(characterId);
+
+    const path =
+      "/avatars/" +
+      (isSpecialCharacter
+        ? SPECIAL_CHARACTERS[characterId as keyof typeof SPECIAL_CHARACTERS]
+        : characterId + ".json");
+
     const request = { status: "fetching", controller } as Request;
 
     this._requests.set(`${characterId}.avatar`, request);
+
     try {
       const response = await fetch(path, { signal: controller.signal });
-      const data = (await response.json()) as AvatarData;
 
-      const collection = collections[data.collection];
-      const avatar = createAvatar<typeof collection>(collection, data.options);
+      let avatar;
+
+      if (isSpecialCharacter) {
+        avatar = await response.text().then((text) => ({
+          toString: () => text,
+          toDataUri: () => `data:image/svg+xml;base64,${btoa(text)}`,
+          toJson: () => ({ svg: text, extra: {} }),
+        }));
+      } else {
+        const data = (await response.json()) as AvatarData;
+
+        const collection = collections[data.collection];
+        avatar = createAvatar<typeof collection>(collection, data.options);
+      }
 
       this._avatars.set(characterId, avatar);
       request.status = "idle";
