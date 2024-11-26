@@ -13,8 +13,8 @@ interface ChatMessageProps {
 }
 
 export function ChatMessage({ result }: ChatMessageProps) {
-  const tag = result.markup?.find((tag) => tag.name === "character");
-  const characterId = tag?.properties.name.toLowerCase();
+  const characterTag = result.markup?.find((tag) => tag.name === "character");
+  const characterId = characterTag?.properties.name.toLowerCase();
 
   const characters = useCharacters();
 
@@ -64,37 +64,47 @@ export function ChatMessage({ result }: ChatMessageProps) {
     }, []);
   });
 
+  const isFlipped =
+    characterId === PLAYER_ID ||
+    result.markup?.find((tag) => tag.name === "inside");
+
   return (
     <li
       className={clsx(
-        "chat",
-        characterId === PLAYER_ID ? "chat-end" : "chat-start"
+        "chat py-2 px-4",
+        isFlipped ? "chat-end" : "chat-start",
+        result.markup?.find((tag) => tag.name === "inside")
+          ? "bg-neutral-400 shadow-v shadow-neutral-400"
+          : undefined
       )}
     >
-      {tag ? (
-        <div className="chat-image avatar">
-          {tag.properties.as ? (
-            <Avatar
-              characterId={tag.properties.as.toLocaleLowerCase()}
-              className={clsx(
-                "relative",
-                characterId === PLAYER_ID ? "-me-4" : "-ms-4"
-              )}
-            />
-          ) : null}
-          <Avatar characterId={tag.properties.name.toLocaleLowerCase()} />
-        </div>
-      ) : null}
+      <div className="chat-image avatar flex">
+        {characterTag?.properties.as ? (
+          <Avatar
+            characterId={characterTag.properties.as.toLocaleLowerCase()}
+            className={clsx("relative", isFlipped ? "-me-4" : "order-1 -ms-4")}
+          />
+        ) : null}
+        {characterId &&
+        (characterId === PLAYER_ID || !characterTag?.properties.as) ? (
+          <Avatar characterId={characterId} />
+        ) : null}
+      </div>
       {characterId ? (
         <div className="chat-header">
-          {tag?.properties.as
-            ? `${tag.properties.as}  (${characters.getName(characterId)})`
+          {characterTag?.properties.as
+            ? characterTag.properties.as +
+              (characterId === PLAYER_ID
+                ? ` (${characters.getName(characterId)})`
+                : "")
             : characters.getName(characterId)}
         </div>
       ) : null}
       <div
         className={clsx(
-          "chat-bubble",
+          result.markup?.find((tag) => tag.name === "inside")
+            ? undefined
+            : "chat-bubble",
           characterId === PLAYER_ID ? "chat-bubble-primary" : ""
         )}
       >
