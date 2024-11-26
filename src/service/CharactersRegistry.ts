@@ -4,6 +4,7 @@ import { IVariablesStorage } from "yarn-bound";
 import * as collections from "@dicebear/collection";
 
 const SPECIAL_CHARACTERS = {
+  unknown: "incognito-circle.svg",
   anonymous: "incognito-circle.svg",
   "cryptosecure support": "support-circle.svg",
 };
@@ -38,11 +39,14 @@ export class CharactersRegistry {
   }
 
   async getAvatar(characterId: string) {
-    if (this._avatars.has(characterId)) {
-      return Promise.resolve(this._avatars.get(characterId));
+    const avatarName =
+      this._variables.get(`${characterId}_avatar`)?.toString() || characterId;
+
+    if (this._avatars.has(avatarName)) {
+      return Promise.resolve(this._avatars.get(avatarName));
     } else {
       try {
-        const avatar = await this.preload(characterId);
+        const avatar = await this.preload(avatarName);
         return avatar;
       } catch {
         return undefined;
