@@ -72,7 +72,7 @@ export function App() {
     }
 
     if (currentScript) {
-      console.log(dialogue);
+      if (process.env.NODE_ENV === "development") console.log(dialogue);
       const controller = new AbortController();
 
       fetch(currentScript, { signal: controller.signal })

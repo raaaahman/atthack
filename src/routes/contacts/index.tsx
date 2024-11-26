@@ -19,16 +19,19 @@ export const Route = createFileRoute("/contacts/")({
           .concat(context.dialogue.currentResult || [])
           .reduce(
             (results, result) =>
-              result.metadata.screen?.startsWith(SCREEN_PREFIX) &&
-              !results.find(
-                (current) => current.metadata.screen === result.metadata.screen
-              )
-                ? results.concat(result)
-                : results,
+              {
+              const screen = result.metadata.screen;
+                return typeof screen === 'string' && screen.startsWith(SCREEN_PREFIX) &&
+                  !results.find(
+                    (current) => current.metadata.screen === result.metadata.screen
+                  )
+                  ? results.concat(result)
+                  : results;
+              },
             [] as (TextResult | CommandResult | OptionsResult)[]
           )
           .map((result) => {
-            const id = result.metadata.screen.slice(SCREEN_PREFIX.length);
+            const id = result.metadata.screen.slice(SCREEN_PREFIX.length) as string;
             return {
               id,
               name: context.characters.getName(id),
