@@ -12,8 +12,8 @@ import { DialogueContext } from "@/contexts/DialogueContext";
 import { CharactersContext } from "@/contexts/CharactersContext";
 import { CharactersRegistry } from "@/service/CharactersRegistry";
 import { LocalStorageManager } from "@/service/LocalStorageManager";
-import { isVariables, MemoryVariables } from "./service/MemoryVariables";
-import { DialogueRunner, isDialogueRunner } from "./service/DialogueRunner";
+import { isVariables, MemoryVariables } from "@/service/MemoryVariables";
+import { DialogueRunner, isDialogueRunner } from "@/service/DialogueRunner";
 
 const storage = new LocalStorageManager({});
 
