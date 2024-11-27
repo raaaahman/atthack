@@ -75,10 +75,12 @@ export class DialogueRunner extends YarnBound {
       ),
       history: this.history.slice(
         0,
-        lastIndex && lastIndex >= 0 ? lastIndex : undefined
+        typeof lastIndex === "number" && lastIndex >= 0 ? lastIndex : undefined
       ),
       currentResult:
-        lastIndex && lastIndex >= 0
+        typeof lastIndex === "number" &&
+        lastIndex >= 0 &&
+        lastIndex < this.history.length
           ? this.history[lastIndex]
           : this.currentResult,
     };
