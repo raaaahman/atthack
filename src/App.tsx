@@ -73,9 +73,14 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    let lastTitle = dialogue?.currentResult?.metadata.title;
+
     if (project && dialogue)
       return subscribe(dialogue, () => {
-        storage.saveItems();
+        if (dialogue.currentResult?.metadata.title !== lastTitle) {
+          storage.saveItems();
+          lastTitle = dialogue.currentResult?.metadata.title;
+        }
 
         if (!currentScript) return;
 
