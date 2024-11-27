@@ -9,18 +9,47 @@ import { ProjectContext } from "@/contexts/ProjectContext";
 import { IProject } from "@/types/IProject";
 import { VariableStorageContext } from "@/contexts/VariableStorageContext";
 import { DialogueContext } from "@/contexts/DialogueContext";
-import { CharactersContext } from "./contexts/CharactersContext";
-import { CharactersRegistry } from "./service/CharactersRegistry";
+import { CharactersContext } from "@/contexts/CharactersContext";
+import { CharactersRegistry } from "@/service/CharactersRegistry";
+import { LocalStorageManager } from "@/service/LocalStorageManager";
+import { isVariables, MemoryVariables } from "./service/MemoryVariables";
+import { DialogueRunner, isDialogueRunner } from "./service/DialogueRunner";
+
+const storage = new LocalStorageManager({});
 
 export function App() {
   const [status, setStatus] = useState<"pending" | "error" | "success">(
     "pending"
   );
   const [project, setProject] = useState<IProject | null>(null);
-  const variables = useRef(new Map());
-  const [currentScript, setCurrentScript] = useState<string | undefined>();
+  const variables = useRef(
+    storage.getItem("variables", (data) =>
+      isVariables(data) ? new MemoryVariables(data) : new MemoryVariables()
+    )
+  );
   const [dialogue, setDialogue] = useState<YarnBound | null>(null);
   const characters = useRef(new CharactersRegistry(variables.current));
+
+  const dialogueOptions = {
+    startAt: "Mission_Start",
+    variableStorage: variables.current,
+    combineTextAndOptionsResults: true,
+  };
+
+  const local = storage.getItem("dialogue", (data) =>
+    isDialogueRunner(data)
+      ? DialogueRunner.fromJSON(data, dialogueOptions)
+      : null
+  );
+
+  const [currentScript, setCurrentScript] = useState<string | undefined>(
+    local
+      ? "/scripts/" +
+          local.currentResult?.metadata.filetags.find((tag?: string) =>
+            tag?.endsWith("yarn")
+          ) || "index.yarn"
+      : undefined
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -28,7 +57,9 @@ export function App() {
     loadProject(controller.signal)
       .then((data) => {
         setProject(data);
-        setCurrentScript(data.sourceScripts[0]);
+        setCurrentScript(
+          (currentScript) => currentScript || data.sourceScripts[0]
+        );
         setStatus("success");
 
         return data;
@@ -44,6 +75,8 @@ export function App() {
   useEffect(() => {
     if (project && dialogue)
       return subscribe(dialogue, () => {
+        storage.saveItems();
+
         if (!currentScript) return;
 
         const currentIndex = project.sourceScripts.findIndex(
@@ -71,7 +104,9 @@ export function App() {
       dialogue.runner.setVariableStorage(variables.current);
     }
 
-    if (currentScript) {
+    if (!dialogue && local) {
+      setDialogue(proxy(local));
+    } else if (currentScript) {
       if (process.env.NODE_ENV === "development") console.log(dialogue);
       const controller = new AbortController();
 
@@ -84,15 +119,14 @@ export function App() {
             dialogue.runner.load(script);
             dialogue.jump("Mission_Start");
           } else {
-            setDialogue(
-              proxy(
-                new YarnBound({
-                  dialogue: script,
-                  variableStorage: variables.current,
-                  combineTextAndOptionsResults: true,
-                })
-              )
-            );
+            const dialogue = new DialogueRunner({
+              dialogue: script,
+              ...dialogueOptions,
+            });
+
+            storage.setItem("dialogue", dialogue);
+
+            setDialogue(proxy(dialogue));
           }
         })
         .catch((error) => {
@@ -137,6 +171,7 @@ export function App() {
     </>
   );
 }
+
 function LoadingSpinner() {
   return (
     <div className="h-dvh flex flex-col justify-center items-center">

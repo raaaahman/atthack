@@ -20,7 +20,7 @@ declare module "yarn-bound" {
   export type NodeMetadata = {
     [key: string]: string | string[];
     title: string;
-    fileTags: string[];
+    filetags: string[];
   };
 
   export type BaseResult = {
