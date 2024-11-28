@@ -1,12 +1,15 @@
-import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
-import YarnBound, { OptionsResult, TextResult } from "yarn-bound";
-import { EnvelopeIcon } from "@heroicons/react/24/outline";
+import YarnBound, {
+  CommandResult,
+  OptionsResult,
+  TextResult,
+} from "yarn-bound";
 
 import { Immutable } from "@/types/Immutable";
-import { useVariableStorage } from "@/contexts/VariableStorageContext";
 import { ChatMessage } from "./ChatMessage";
+import { PLAYER_ID } from "@/constants";
+import { ChatInput } from "./ChatInput";
 
 interface DialogueComponentProps {
   state: Pick<YarnBound, "history" | "currentResult">;
@@ -15,11 +18,20 @@ interface DialogueComponentProps {
 
 export function DialogueComponent({ state, advance }: DialogueComponentProps) {
   const snap = useSnapshot(state);
+  const [result, setResult] = useState<Immutable<
+    Partial<TextResult | OptionsResult | CommandResult>
+  > | null>(snap.currentResult);
 
   // autorun
   useEffect(() => {
-    if (snap.currentResult && "command" in snap.currentResult) {
+    let timeout: NodeJS.Timeout;
+
+    if (!snap.currentResult) {
+      setResult(null);
+    } else if ("command" in snap.currentResult) {
       if (snap.currentResult.command.startsWith("wait")) {
+        setResult(null);
+
         setTimeout(
           () => {
             advance();
@@ -29,19 +41,37 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
           ) * 1000
         );
       }
-    } else if (
-      snap.currentResult &&
-      !("options" in snap.currentResult) &&
-      !snap.currentResult.isDialogueEnd
-    ) {
-      const timeout = setTimeout(() => {
-        advance();
-      }, 500);
-
-      return () => {
-        clearTimeout(timeout);
-      };
+    } else {
+      const isPlayer = snap.currentResult?.markup?.find(
+        (tag) =>
+          tag.name === "character" &&
+          tag.properties.name.toLowerCase() === PLAYER_ID
+      );
+      setResult(
+        isPlayer
+          ? null
+          : {
+              ...snap.currentResult,
+              text: "",
+            }
+      );
+      timeout = setTimeout(
+        () => {
+          setResult(snap.currentResult);
+          if (
+            snap.currentResult &&
+            !("options" in snap.currentResult) &&
+            !snap.currentResult.isDialogueEnd
+          )
+            advance();
+        },
+        (snap.currentResult?.text?.length || 20) * 25
+      );
     }
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [advance, snap.currentResult]);
 
   return (
@@ -54,115 +84,26 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
         ).map((result, i) => (
           <ChatMessage key={result.metadata.screen + "-" + i} result={result} />
         ))}
-        {snap.currentResult && "text" in snap.currentResult ? (
+        {result && !("options" in result) && !("command" in result) ? (
           <ChatMessage
-            key={snap.currentResult.metadata.screen + "-" + snap.history.length}
-            result={snap.currentResult}
+            key={
+              (result.metadata?.screen || "dialogue") +
+              "-" +
+              snap.history.length
+            }
+            result={result}
           />
         ) : null}
       </ul>
       <ChatInput
         key={
-          snap.currentResult?.metadata.screen + "-input-" + snap.history.length
+          (snap.currentResult?.metadata?.screen || "dialogue") +
+          "-input-" +
+          snap.history.length
         }
         result={snap.currentResult}
         advance={advance}
       />
     </div>
-  );
-}
-
-interface ChatInputProps {
-  result: Immutable<YarnBound["currentResult"]>;
-  advance: YarnBound["advance"];
-}
-
-function ChatInput({ result, advance }: ChatInputProps) {
-  const variables = useVariableStorage();
-  const [isValidInput, setIsValidInput] = useState(false);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    if (formData.has("option"))
-      advance(parseInt(formData.get("option") as string));
-
-    if (formData.has("prompt")) {
-      variables.set(
-        formData.get("variable-name")?.toString() || "user_input",
-        formData.get("prompt")!.toString()
-      );
-      advance();
-    }
-  };
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-row gap-2 items-center py-4"
-    >
-      {result && "command" in result && result.command.startsWith("prompt") ? (
-        <>
-          <input
-            type="text"
-            name="prompt"
-            className="input input-bordered input-primary w-full max-w-lg"
-            placeholder="Type here."
-            onChange={(event) => {
-              setIsValidInput(event.target.value.length >= 1);
-            }}
-          />
-          <input
-            type="hidden"
-            name="variable-name"
-            value={result.command.match(/\$(\w+)/)?.at(1) || "user_input"}
-          />
-        </>
-      ) : (
-        <select
-          name="option"
-          aria-placeholder="Type here."
-          className="input input-bordered w-full max-w-lg"
-          disabled={!result || !("options" in result)}
-          onChange={
-            result && "options" in result
-              ? (event) => {
-                  setIsValidInput(
-                    parseInt(event.target.value) < result.options.length
-                  );
-                }
-              : undefined
-          }
-          defaultValue={-1}
-        >
-          <option disabled={true} value={-1}>
-            {result && "options" in result ? "Pick an answer." : ""}
-          </option>
-          {result && "options" in result
-            ? result.options.map((option, index) => (
-                <option
-                  className={clsx(option.isAvailable ? "" : "hidden")}
-                  key={option.text}
-                  value={index}
-                  disabled={!option.isAvailable}
-                >
-                  {option.text}
-                </option>
-              ))
-            : null}
-        </select>
-      )}
-      <button
-        type="submit"
-        className={clsx(
-          "btn btn-circle size-12",
-          isValidInput ? "btn-primary" : "btn-disabled"
-        )}
-        disabled={!isValidInput}
-      >
-        <span className="sr-only">Send</span>
-        <EnvelopeIcon role="presentation" title="Send" className="size-8" />
-      </button>
-    </form>
   );
 }

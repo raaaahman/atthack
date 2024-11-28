@@ -9,7 +9,7 @@ import MARKUP from "@/components/markup";
 import { Immutable } from "@/types/Immutable";
 
 interface ChatMessageProps {
-  result: Immutable<TextResult | OptionsResult>;
+  result: Immutable<Partial<TextResult> | OptionsResult>;
 }
 
 export function ChatMessage({ result }: ChatMessageProps) {
@@ -63,10 +63,10 @@ export function ChatMessage({ result }: ChatMessageProps) {
       }
     }, []);
   });
+  const isPlayer = characterId === PLAYER_ID;
 
   const isFlipped =
-    characterId === PLAYER_ID ||
-    result.markup?.find((tag) => tag.name === "inside");
+    isPlayer || result.markup?.find((tag) => tag.name === "inside");
 
   return (
     <li
@@ -85,8 +85,7 @@ export function ChatMessage({ result }: ChatMessageProps) {
             className={clsx("relative", isFlipped ? "-me-4" : "order-1 -ms-4")}
           />
         ) : null}
-        {characterId &&
-        (characterId === PLAYER_ID || !characterTag?.properties.as) ? (
+        {characterId && (isPlayer || !characterTag?.properties.as) ? (
           <Avatar characterId={characterId} />
         ) : null}
       </div>
@@ -104,11 +103,20 @@ export function ChatMessage({ result }: ChatMessageProps) {
         className={clsx(
           result.markup?.find((tag) => tag.name === "inside")
             ? undefined
-            : "chat-bubble",
-          characterId === PLAYER_ID ? "chat-bubble-primary" : ""
+            : "chat-bubble transition-[width]",
+          isPlayer ? "chat-bubble-primary" : ""
         )}
       >
-        {content}
+        {content.length > 0 ? (
+          content
+        ) : (
+          <span
+            className={clsx(
+              "loading loading-dots loading-md",
+              isPlayer ? "text-neutral-content" : "text-primary-content"
+            )}
+          />
+        )}
       </div>
     </li>
   );
