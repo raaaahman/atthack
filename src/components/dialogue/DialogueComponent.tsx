@@ -21,6 +21,7 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
   const [result, setResult] = useState<Immutable<
     Partial<TextResult | OptionsResult | CommandResult>
   > | null>(snap.currentResult);
+  const [canAdvance, setCanAdvance] = useState(false);
 
   // autorun
   useEffect(() => {
@@ -31,9 +32,11 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
     } else if ("command" in snap.currentResult) {
       if (snap.currentResult.command.startsWith("wait")) {
         setResult(null);
+        setCanAdvance(false);
 
-        setTimeout(
+        timeout = setTimeout(
           () => {
+            setCanAdvance(true);
             advance();
           },
           parseInt(
@@ -42,6 +45,7 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
         );
       }
     } else {
+      setCanAdvance(false);
       const isPlayer = snap.currentResult?.markup?.find(
         (tag) =>
           tag.name === "character" &&
@@ -57,13 +61,8 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
       );
       timeout = setTimeout(
         () => {
-          setResult(snap.currentResult);
-          if (
-            snap.currentResult &&
-            !("options" in snap.currentResult) &&
-            !snap.currentResult.isDialogueEnd
-          )
-            advance();
+          setCanAdvance(true);
+          if (!isPlayer) setResult(snap.currentResult);
         },
         (snap.currentResult?.text?.length || 20) * 25
       );
@@ -74,8 +73,16 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
     };
   }, [advance, snap.currentResult]);
 
+  const handleClick = () => {
+    if (canAdvance && snap.currentResult && !("options" in snap.currentResult))
+      advance();
+  };
+
   return (
-    <div className="flex-grow flex flex-col justify-between bg-neutral-300">
+    <div
+      className="flex-grow flex flex-col justify-between bg-neutral-300"
+      onClick={handleClick}
+    >
       <ul className="overflow-y-scroll">
         {(
           snap.history.filter((result) => "text" in result) as Immutable<
