@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  /* From: https://css-tricks.com/snippets/css/typewriter-effect/ */
+  .typewriter {
+    overflow: hidden;
+    border-right: 0.1em solid;
+    @apply border-primary;
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+    animation: typing var(--ah-animate-duration) steps(var(--ah-animate-steps), end), blink-caret .75s step-end infinite;
+  }
+}
+
+@keyframes typing {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { @apply border-primary; }
+}
+
 :root {
   color-scheme: light dark;
 
@@ -9,6 +31,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --ah-animate-duration: 3s;
+  --ah-animate-steps: 36;
 }
 
 body {

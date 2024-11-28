@@ -34,7 +34,7 @@ export function App() {
   const dialogueOptions = {
     startAt: "Mission_Start",
     variableStorage: variables.current,
-    combineTextAndOptionsResults: true,
+    combineTextAndOptionsResults: false,
   };
 
   const local = storage.getItem("dialogue", (data) =>
