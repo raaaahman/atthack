@@ -21,8 +21,13 @@ export function useDialogue({ screen }: { screen: string }) {
     },
   });
 
+  const advance = (optionIndex?: number) => {
+    if (dialogue.currentResult?.metadata.screen === screen)
+      dialogue.advance(optionIndex);
+  };
+
   return {
     state: derived,
-    advance: dialogue?.advance.bind(dialogue),
+    advance,
   };
 }

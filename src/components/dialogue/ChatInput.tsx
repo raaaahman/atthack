@@ -23,20 +23,22 @@ export function ChatInput({ result, advance }: ChatInputProps) {
     const formData = new FormData(event.currentTarget);
     if (formData.has("option"))
       advance(parseInt(formData.get("option") as string));
-
-    if (formData.has("prompt")) {
+    else if (formData.has("prompt")) {
       variables.set(
         formData.get("variable-name")?.toString() || "user_input",
         formData.get("prompt")!.toString()
       );
       advance();
+      setIsValidInput(false);
+    } else {
+      advance();
     }
   };
 
   const isFromPlayer =
-    result &&
+    !!result &&
     "text" in result &&
-    result.markup?.find(
+    !!result.markup?.find(
       (tag) =>
         tag.name === "character" &&
         tag.properties.name.toLowerCase() === PLAYER_ID
@@ -122,11 +124,11 @@ export function ChatInput({ result, advance }: ChatInputProps) {
           type="submit"
           className={clsx(
             "btn btn-circle size-12 p-2 ms-2",
-            isValidInput
-              ? "btn-secondary text-secondary-content"
+            isValidInput || isFromPlayer
+              ? "btn-primary text-primary-content"
               : "btn-disabled text-neutral-content"
           )}
-          disabled={!isValidInput}
+          disabled={!isValidInput && !isFromPlayer}
         >
           <EnvelopeIcon title="Send" role="presentation" />
         </button>
