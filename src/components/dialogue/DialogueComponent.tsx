@@ -18,10 +18,20 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
 
   // autorun
   useEffect(() => {
-    if (
+    if (snap.currentResult && "command" in snap.currentResult) {
+      if (snap.currentResult.command.startsWith("wait")) {
+        setTimeout(
+          () => {
+            advance();
+          },
+          parseInt(
+            snap.currentResult.command.match(/wait\s(\d+)/)?.at(1) || "1"
+          ) * 1000
+        );
+      }
+    } else if (
       snap.currentResult &&
       !("options" in snap.currentResult) &&
-      !("command" in snap.currentResult) &&
       !snap.currentResult.isDialogueEnd
     ) {
       const timeout = setTimeout(() => {
