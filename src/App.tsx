@@ -1,7 +1,8 @@
 import { RouterProvider } from "@tanstack/react-router";
 import YarnBound from "yarn-bound";
 import { useEffect, useRef, useState } from "react";
-import { proxy, subscribe } from "valtio";
+import { proxy } from "valtio";
+import { subscribeKey } from "valtio/utils";
 
 import { router } from "@/router";
 import { loadProject } from "@/queries/loadProject";
@@ -76,7 +77,7 @@ export function App() {
     let lastTitle = dialogue?.currentResult?.metadata.title;
 
     if (project && dialogue)
-      return subscribe(dialogue, () => {
+      return subscribeKey(dialogue, "currentResult", () => {
         if (dialogue.currentResult?.metadata.title !== lastTitle) {
           storage.saveItems();
           lastTitle = dialogue.currentResult?.metadata.title;
@@ -84,15 +85,15 @@ export function App() {
 
         if (!currentScript) return;
 
-        const currentIndex = project.sourceScripts.findIndex(
-          (path) => path === currentScript
-        );
-
-        if (
-          currentIndex < project.sourceScripts.length &&
-          dialogue.currentResult?.isDialogueEnd
-        )
-          setCurrentScript(project.sourceScripts[currentIndex + 1]);
+        if (dialogue.currentResult?.isDialogueEnd)
+          setCurrentScript((currentScript) => {
+            const currentIndex = project.sourceScripts.findIndex(
+              (path) => path === currentScript
+            );
+            return currentIndex < project.sourceScripts.length
+              ? project.sourceScripts[currentIndex + 1]
+              : currentScript;
+          });
       });
   }, [project, dialogue]);
 
@@ -184,4 +185,3 @@ function LoadingSpinner() {
     </div>
   );
 }
-
