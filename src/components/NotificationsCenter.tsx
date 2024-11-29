@@ -9,7 +9,7 @@ import { Immutable } from "@/types/Immutable";
 import { Avatar } from "@/components/Avatar";
 import { useCharacters } from "@/contexts/CharactersContext";
 import { PLAYER_ID } from "@/constants";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
 import { pathname } from "@/utils";
 
 type NotificationsCenterProps = {
@@ -27,7 +27,7 @@ export function NotificationsCenter({ screen }: NotificationsCenterProps) {
   const [notifcation, setNotification] =
     useState<Immutable<YarnBound["currentResult"]>>(null);
 
-  const characterId = notifcation?.markup
+  const characterId = snap.currentResult?.markup
     ?.find((tag) => tag.name === "character")
     ?.properties.name.toLocaleLowerCase();
 
@@ -40,10 +40,10 @@ export function NotificationsCenter({ screen }: NotificationsCenterProps) {
         snap.currentResult.metadata.screen !== screen
       ) {
         setNotification(snap.currentResult);
-        const tiemout = setTimeout(() => {
+        const timeout = setTimeout(() => {
           setNotification(null);
         }, 3600);
-        return () => clearTimeout(tiemout);
+        return () => clearTimeout(timeout);
       }
     }
   }, [snap.currentResult]);
@@ -78,7 +78,7 @@ export function NotificationsCenter({ screen }: NotificationsCenterProps) {
               : "You received a new message."}
           </div>
           <span className="sr-only">Read</span>
-          <ArrowTopRightOnSquareIcon
+          <ArrowUpRightIcon
             title="Read"
             role="presentation"
             className="size-12"
