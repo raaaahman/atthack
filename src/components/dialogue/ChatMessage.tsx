@@ -74,7 +74,7 @@ export function ChatMessage({ result }: ChatMessageProps) {
         "chat py-2 px-4",
         isFlipped ? "chat-end" : "chat-start",
         result.markup?.find((tag) => tag.name === "inside")
-          ? "bg-neutral-400 shadow-v shadow-neutral-400"
+          ? "bg-neutral-400 shadow-v shadow-neutral-400 text-neutral"
           : undefined
       )}
     >
@@ -103,19 +103,14 @@ export function ChatMessage({ result }: ChatMessageProps) {
         className={clsx(
           result.markup?.find((tag) => tag.name === "inside")
             ? undefined
-            : "chat-bubble transition-[width]",
-          isPlayer ? "chat-bubble-primary" : ""
+            : "chat-bubble",
+          isPlayer ? "chat-bubble-primary text-primary-content" : ""
         )}
       >
         {content.length > 0 ? (
           content
         ) : (
-          <span
-            className={clsx(
-              "loading loading-dots loading-md",
-              isPlayer ? "text-neutral-content" : "text-primary-content"
-            )}
-          />
+          <span className="loading loading-dots loading-md text-inherit" />
         )}
       </div>
     </li>

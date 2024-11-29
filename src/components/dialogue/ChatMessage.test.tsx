@@ -39,7 +39,7 @@ describe("The ChatMessage component", () => {
           text: "Hello World!",
           metadata: {
             title: "Hello_World",
-            fileTags: [],
+            filetags: [],
           },
           hashtags: [],
         }}
@@ -59,7 +59,7 @@ describe("The ChatMessage component", () => {
           text: "'sup?",
           metadata: {
             title: "Hello_World",
-            fileTags: [],
+            filetags: [],
           },
           hashtags: [],
           markup: [
@@ -89,7 +89,7 @@ describe("The ChatMessage component", () => {
           text: "This is the real one!",
           metadata: {
             title: "Node",
-            fileTags: [],
+            filetags: [],
           },
           hashtags: [],
           markup: [{ name: "b", position: 5, length: 2, properties: {} }],
@@ -110,7 +110,7 @@ describe("The ChatMessage component", () => {
           text: "Don't talk to me like that!",
           metadata: {
             title: "Node",
-            fileTags: [],
+            filetags: [],
           },
           hashtags: [],
           markup: [
