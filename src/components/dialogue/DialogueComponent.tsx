@@ -35,10 +35,12 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
         "command" in snap.currentResult ||
         "options" in snap.currentResult
         ? null
-        : {
-            ...snap.currentResult,
-            text: "",
-          }
+        : !snap.currentResult.markup?.find((tag) => tag.name === "character")
+          ? snap.currentResult
+          : {
+              ...snap.currentResult,
+              text: "",
+            }
     );
   }, [snap.currentResult, isPlayer]);
 
@@ -49,6 +51,7 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
       snap.currentResult &&
       !("command" in snap.currentResult) &&
       !("options" in snap.currentResult) &&
+      snap.currentResult.markup?.find((tag) => tag.name === "character") &&
       !isPlayer
     ) {
       timeout = setTimeout(
