@@ -42,23 +42,12 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
     );
   }, [snap.currentResult, isPlayer]);
 
-  // autorun
   useEffect(() => {
     let timeout: NodeJS.Timeout;
 
-    if (snap.currentResult && "command" in snap.currentResult) {
-      if (snap.currentResult.command.startsWith("wait")) {
-        timeout = setTimeout(
-          () => {
-            advance();
-          },
-          parseInt(
-            snap.currentResult.command.match(/wait\s(\d+)/)?.at(1) || "1"
-          ) * 1000
-        );
-      }
-    } else if (
+    if (
       snap.currentResult &&
+      !("command" in snap.currentResult) &&
       !("options" in snap.currentResult) &&
       !isPlayer
     ) {

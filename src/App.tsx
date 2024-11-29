@@ -83,6 +83,21 @@ export function App() {
           lastTitle = dialogue.currentResult?.metadata.title;
         }
 
+        if (
+          dialogue.currentResult &&
+          "command" in dialogue.currentResult &&
+          dialogue.currentResult.command.startsWith("wait")
+        ) {
+          setTimeout(
+            () => {
+              dialogue.advance();
+            },
+            parseInt(
+              dialogue.currentResult.command.match(/wait\s(\d+)/)?.at(1) || "1"
+            ) * 1000
+          );
+        }
+
         if (!currentScript) return;
 
         if (dialogue.currentResult?.isDialogueEnd)
