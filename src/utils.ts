@@ -1,12 +1,12 @@
 export function screenName(pathname: string) {
-  const [match, path, params] = pathname.match(/^\/?(.*)\/(\w+)\/?$/) || [];
+  const [match, path, params] = pathname.match(/^(.*)\/(\w*)\/?$/) || [];
 
   if (!match) return undefined;
 
   switch (path) {
-    case "contacts":
+    case "/contacts":
       return params ? "conversation_" + params : undefined;
-    case "ai":
+    case "/ai":
       return params ? "ai_" + params : undefined;
     default:
       return "home";
