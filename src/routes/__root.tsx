@@ -9,7 +9,7 @@ import YarnBound, { IVariablesStorage } from "yarn-bound";
 import { Navbar } from "@/components/Navbar";
 import { IProject } from "@/types/IProject";
 import { CharactersRegistry } from "@/service/CharactersRegistry";
-import { NotificationsCenter } from "@/components/NotificationsCenter";
+import { NotificationsCenter } from "@/components/notifications/NotificationsCenter";
 import { screenName } from "@/utils";
 
 interface RootContext {
