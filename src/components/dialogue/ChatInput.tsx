@@ -30,9 +30,7 @@ export function ChatInput({ result, advance }: ChatInputProps) {
       );
       advance();
       setIsValidInput(false);
-    } else {
-      advance();
-    }
+    } 
   };
 
   const isFromPlayer =

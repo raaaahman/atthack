@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useSnapshot } from "valtio";
 import YarnBound, {
   CommandResult,
@@ -18,25 +18,38 @@ interface DialogueComponentProps {
 
 export function DialogueComponent({ state, advance }: DialogueComponentProps) {
   const snap = useSnapshot(state);
-  const [result, setResult] = useState<Immutable<
+  const [currentResult, setCurrentResult] = useState<Immutable<
     Partial<TextResult | OptionsResult | CommandResult>
   > | null>(snap.currentResult);
-  const [canAdvance, setCanAdvance] = useState(false);
+
+  const isPlayer = snap.currentResult?.markup?.find(
+    (tag) =>
+      tag.name === "character" &&
+      tag.properties.name.toLowerCase() === PLAYER_ID
+  );
+
+  useLayoutEffect(() => {
+    setCurrentResult(
+      !snap.currentResult ||
+        isPlayer ||
+        "command" in snap.currentResult ||
+        "options" in snap.currentResult
+        ? null
+        : {
+            ...snap.currentResult,
+            text: "",
+          }
+    );
+  }, [snap.currentResult, isPlayer]);
 
   // autorun
   useEffect(() => {
     let timeout: NodeJS.Timeout;
 
-    if (!snap.currentResult) {
-      setResult(null);
-    } else if ("command" in snap.currentResult) {
+    if (snap.currentResult && "command" in snap.currentResult) {
       if (snap.currentResult.command.startsWith("wait")) {
-        setResult(null);
-        setCanAdvance(false);
-
         timeout = setTimeout(
           () => {
-            setCanAdvance(true);
             advance();
           },
           parseInt(
@@ -44,25 +57,14 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
           ) * 1000
         );
       }
-    } else {
-      setCanAdvance(false);
-      const isPlayer = snap.currentResult?.markup?.find(
-        (tag) =>
-          tag.name === "character" &&
-          tag.properties.name.toLowerCase() === PLAYER_ID
-      );
-      setResult(
-        isPlayer
-          ? null
-          : {
-              ...snap.currentResult,
-              text: "",
-            }
-      );
+    } else if (
+      snap.currentResult &&
+      !("options" in snap.currentResult) &&
+      !isPlayer
+    ) {
       timeout = setTimeout(
         () => {
-          setCanAdvance(true);
-          if (!isPlayer) setResult(snap.currentResult);
+          setCurrentResult(snap.currentResult);
         },
         (snap.currentResult?.text?.length || 20) * 25
       );
@@ -71,10 +73,10 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
     return () => {
       clearTimeout(timeout);
     };
-  }, [advance, snap.currentResult]);
+  }, [advance, snap.currentResult, isPlayer]);
 
   const handleClick = () => {
-    if (canAdvance && snap.currentResult && !("options" in snap.currentResult))
+    if (isPlayer || (currentResult && currentResult === snap.currentResult))
       advance();
   };
 
@@ -83,7 +85,7 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
       className="flex-grow flex flex-col justify-between bg-neutral-300"
       onClick={handleClick}
     >
-      <ul className="overflow-y-scroll">
+      <ul className="w-full overflow-y-scroll">
         {(
           snap.history.filter((result) => "text" in result) as Immutable<
             OptionsResult | TextResult
@@ -91,14 +93,16 @@ export function DialogueComponent({ state, advance }: DialogueComponentProps) {
         ).map((result, i) => (
           <ChatMessage key={result.metadata.screen + "-" + i} result={result} />
         ))}
-        {result && !("options" in result) && !("command" in result) ? (
+        {currentResult &&
+        !("options" in currentResult) &&
+        !("command" in currentResult) ? (
           <ChatMessage
             key={
-              (result.metadata?.screen || "dialogue") +
+              (currentResult.metadata?.screen || "dialogue") +
               "-" +
               snap.history.length
             }
-            result={result}
+            result={currentResult}
           />
         ) : null}
       </ul>
