@@ -14,7 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as ContactsIndexImport } from './routes/contacts/index'
-import { Route as AiIndexImport } from './routes/ai/index'
+import { Route as AiModelIdImport } from './routes/ai/$modelId'
 
 // Create Virtual Routes
 
@@ -37,12 +37,6 @@ const ContactsIndexRoute = ContactsIndexImport.update({
   import('./routes/contacts/index.lazy').then((d) => d.Route),
 )
 
-const AiIndexRoute = AiIndexImport.update({
-  id: '/ai/',
-  path: '/ai/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/ai/index.lazy').then((d) => d.Route))
-
 const ContactsContactIdLazyRoute = ContactsContactIdLazyImport.update({
   id: '/contacts/$contactId',
   path: '/contacts/$contactId',
@@ -50,6 +44,12 @@ const ContactsContactIdLazyRoute = ContactsContactIdLazyImport.update({
 } as any).lazy(() =>
   import('./routes/contacts/$contactId.lazy').then((d) => d.Route),
 )
+
+const AiModelIdRoute = AiModelIdImport.update({
+  id: '/ai/$modelId',
+  path: '/ai/$modelId',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/ai/$modelId.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
@@ -62,18 +62,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/ai/$modelId': {
+      id: '/ai/$modelId'
+      path: '/ai/$modelId'
+      fullPath: '/ai/$modelId'
+      preLoaderRoute: typeof AiModelIdImport
+      parentRoute: typeof rootRoute
+    }
     '/contacts/$contactId': {
       id: '/contacts/$contactId'
       path: '/contacts/$contactId'
       fullPath: '/contacts/$contactId'
       preLoaderRoute: typeof ContactsContactIdLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/ai/': {
-      id: '/ai/'
-      path: '/ai'
-      fullPath: '/ai'
-      preLoaderRoute: typeof AiIndexImport
       parentRoute: typeof rootRoute
     }
     '/contacts/': {
@@ -90,46 +90,46 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/ai/$modelId': typeof AiModelIdRoute
   '/contacts/$contactId': typeof ContactsContactIdLazyRoute
-  '/ai': typeof AiIndexRoute
   '/contacts': typeof ContactsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/ai/$modelId': typeof AiModelIdRoute
   '/contacts/$contactId': typeof ContactsContactIdLazyRoute
-  '/ai': typeof AiIndexRoute
   '/contacts': typeof ContactsIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/ai/$modelId': typeof AiModelIdRoute
   '/contacts/$contactId': typeof ContactsContactIdLazyRoute
-  '/ai/': typeof AiIndexRoute
   '/contacts/': typeof ContactsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contacts/$contactId' | '/ai' | '/contacts'
+  fullPaths: '/' | '/ai/$modelId' | '/contacts/$contactId' | '/contacts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contacts/$contactId' | '/ai' | '/contacts'
-  id: '__root__' | '/' | '/contacts/$contactId' | '/ai/' | '/contacts/'
+  to: '/' | '/ai/$modelId' | '/contacts/$contactId' | '/contacts'
+  id: '__root__' | '/' | '/ai/$modelId' | '/contacts/$contactId' | '/contacts/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  AiModelIdRoute: typeof AiModelIdRoute
   ContactsContactIdLazyRoute: typeof ContactsContactIdLazyRoute
-  AiIndexRoute: typeof AiIndexRoute
   ContactsIndexRoute: typeof ContactsIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  AiModelIdRoute: AiModelIdRoute,
   ContactsContactIdLazyRoute: ContactsContactIdLazyRoute,
-  AiIndexRoute: AiIndexRoute,
   ContactsIndexRoute: ContactsIndexRoute,
 }
 
@@ -144,19 +144,19 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/ai/$modelId",
         "/contacts/$contactId",
-        "/ai/",
         "/contacts/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
+    "/ai/$modelId": {
+      "filePath": "ai/$modelId.tsx"
+    },
     "/contacts/$contactId": {
       "filePath": "contacts/$contactId.lazy.tsx"
-    },
-    "/ai/": {
-      "filePath": "ai/index.tsx"
     },
     "/contacts/": {
       "filePath": "contacts/index.tsx"

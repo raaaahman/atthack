@@ -29,7 +29,7 @@ export const Navbar = () => {
         </Link>
       </button>
       <button className={clsx(pathname === "/ai" ? "active" : "")}>
-        <Link className="block" to="/ai">
+        <Link className="block" href="/ai/flemmy">
           <span className="sr-only">AI Assistant</span>
           <SparklesIcon
             title="AI Assistant"
