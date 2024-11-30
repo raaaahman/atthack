@@ -33,13 +33,20 @@ export function NotificationsCenter({ screen }: NotificationsCenterProps) {
         currentResult: (get) => {
           const currentResult = get(state).currentResult;
 
-          return (currentResult && currentResult.metadata.screen !== screen) ||
+          return (currentResult &&
+            currentResult.metadata.screen !== screen &&
+            !currentResult.markup?.find(
+              (tag) =>
+                tag.name === "character" && tag.properties.name === PLAYER_ID
+            ) &&
+            !("options" in currentResult) &&
+            !("command" in currentResult)) ||
             currentResult?.metadata.screen === SCREEN_NAME
             ? currentResult
             : null;
         },
       }),
-    [state]
+    [state, screen]
   );
 
   return (
@@ -67,7 +74,7 @@ function Notifications({
   const [notification, setNotification] =
     useState<Immutable<YarnBound["currentResult"]>>(null);
 
-  const characterId =
+  const conversationId =
     typeof snap.currentResult?.metadata.screen === "string" &&
     snap.currentResult.metadata.screen.match(/conversation_(\w+)/)?.at(1);
 
@@ -75,7 +82,9 @@ function Notifications({
     {
       if (
         snap.currentResult &&
-        characterId !== PLAYER_ID &&
+        snap.currentResult.markup
+          ?.find((tag) => tag.name === "character")
+          ?.properties.name.toLowerCase() !== PLAYER_ID &&
         "text" in snap.currentResult &&
         snap.currentResult.metadata.screen !== screen
       ) {
@@ -96,9 +105,11 @@ function Notifications({
 
   return (
     <div className="toast toast-center toast-top z-10">
-      {notification && characterId ? (
+      {notification && conversationId ? (
         <CharacterNotification
-          characterId={characterId}
+          characterId={notification.markup
+            ?.find((tag) => tag.name === "character")
+            ?.properties.name.toLowerCase()}
           className={route ? "cursor-pointer" : "cursor-auto"}
           role={route ? "link" : ""}
           onClick={
