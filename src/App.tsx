@@ -15,6 +15,7 @@ import { CharactersRegistry } from "@/service/CharactersRegistry";
 import { LocalStorageManager } from "@/service/LocalStorageManager";
 import { isVariables, MemoryVariables } from "@/service/MemoryVariables";
 import { DialogueRunner, isDialogueRunner } from "@/service/DialogueRunner";
+import { Leva, useControls } from "leva";
 
 const storage = new LocalStorageManager({});
 
@@ -52,6 +53,28 @@ export function App() {
       : undefined
   );
 
+  const [, set] = useControls(
+    () => ({
+      script: {
+        value: currentScript,
+        options: project?.sourceScripts || [currentScript],
+        onChange: (value) => {
+          if (
+            dialogue &&
+            !dialogue.currentResult?.metadata.filetags.find(
+              (tag) => "/scripts/" + tag.match(/\w+\.yarn/)?.at(0) === value
+            )
+          ) {
+            dialogue.history = [];
+            dialogue.currentResult = null;
+          }
+          setCurrentScript(value);
+        },
+      },
+    }),
+    [project]
+  );
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -61,6 +84,7 @@ export function App() {
         setCurrentScript(
           (currentScript) => currentScript || data.sourceScripts[0]
         );
+        set({ script: currentScript });
         setStatus("success");
 
         return data;
@@ -168,6 +192,7 @@ export function App() {
 
   return (
     <>
+      <Leva hidden={process.env.NODE_ENV !== "development"} />
       {status === "pending" ? <LoadingSpinner /> : null}
       {status === "success" ? (
         <ProjectContext.Provider value={project}>
