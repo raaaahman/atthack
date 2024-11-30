@@ -1,3 +1,6 @@
+import { PLAYER_ID } from "@/constants";
+import { useDialogue } from "@/contexts/DialogueContext";
+import { screenName } from "@/utils";
 import { SparklesIcon, UserIcon } from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@tanstack/react-router";
@@ -5,6 +8,7 @@ import clsx from "clsx";
 
 export const Navbar = () => {
   const pathname = useLocation({ select: (location) => location.pathname });
+  const { state } = useDialogue({});
 
   return (
     <nav className="btm-nav [position:static_!important;]">
@@ -19,24 +23,52 @@ export const Navbar = () => {
         </Link>
       </button>
       <button className={clsx(pathname === "/contacts" ? "active" : "")}>
-        <Link className="block" to="/contacts">
-          <span className="sr-only">Contacts</span>
-          <UserIcon
-            title="Contacts"
-            role="presentation"
-            className="size-8 m-2 md:size-12 md:m-4"
-          />
-        </Link>
+        <div className="indicator">
+          {!pathname.startsWith("/contacts") &&
+          typeof state.currentResult?.metadata.screen === "string" &&
+          state.currentResult.metadata.screen.startsWith(
+            screenName("/contacts/") || "conversation_"
+          ) &&
+          state.currentResult?.markup
+            ?.find((tag) => tag.name === "character")
+            ?.properties.name.toLowerCase() !== PLAYER_ID &&
+          !("options" in state.currentResult) &&
+          !("command" in state.currentResult) ? (
+            <span className="indicator-item badge badge-secondary">1</span>
+          ) : null}
+          <Link className="block" to="/contacts">
+            <span className="sr-only">Contacts</span>
+            <UserIcon
+              title="Contacts"
+              role="presentation"
+              className="size-8 m-2 md:size-12 md:m-4"
+            />
+          </Link>
+        </div>
       </button>
       <button className={clsx(pathname === "/ai" ? "active" : "")}>
-        <Link className="block" href="/ai/flemmy">
-          <span className="sr-only">AI Assistant</span>
-          <SparklesIcon
-            title="AI Assistant"
-            role="presentation"
-            className="size-8 m-2 md:size-12 md:m-4"
-          />
-        </Link>
+        <div className="indicator">
+          {!pathname.startsWith("/contacts") &&
+          typeof state.currentResult?.metadata.screen === "string" &&
+          state.currentResult.metadata.screen.startsWith(
+            screenName("/ai/") || "ai_"
+          ) &&
+          state.currentResult?.markup
+            ?.find((tag) => tag.name === "character")
+            ?.properties.name.toLowerCase() !== PLAYER_ID &&
+          !("options" in state.currentResult) &&
+          !("command" in state.currentResult) ? (
+            <span className="indicator-item badge badge-secondary">1</span>
+          ) : null}
+          <Link className="block" href="/ai/flemmy">
+            <span className="sr-only">AI Assistant</span>
+            <SparklesIcon
+              title="AI Assistant"
+              role="presentation"
+              className="size-8 m-2 md:size-12 md:m-4"
+            />
+          </Link>
+        </div>
       </button>
     </nav>
   );

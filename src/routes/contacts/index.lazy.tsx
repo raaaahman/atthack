@@ -6,6 +6,9 @@ import {
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
 
 import { Avatar } from "@/components/Avatar";
+import { useDialogue } from "@/contexts/DialogueContext";
+import { SCREEN_PREFIX } from "./-constants";
+import { PLAYER_ID } from "@/constants";
 
 export const Route = createLazyFileRoute("/contacts/")({
   component: RouteComponent,
@@ -13,6 +16,8 @@ export const Route = createLazyFileRoute("/contacts/")({
 
 function RouteComponent() {
   const data = useLoaderData({ from: "/contacts/" });
+  const { state } = useDialogue({});
+
   return (
     <>
       <h1 className="text-2xl font-bold text-center p-2 shadow-sm bg-neutral-100">
@@ -29,13 +34,33 @@ function RouteComponent() {
               <p className="font-semibold">{name}</p>
               <p className="font-light">{role}</p>
             </div>
-            <Link
-              to={`/contacts/${id}`}
-              className="btn btn-circle btn-primary p-1"
-            >
-              <span className="sr-only">Chat</span>
-              <ChatBubbleOvalLeftIcon role="presentation" title="Chat" />
-            </Link>
+            <div className="indicator">
+              {state.currentResult?.metadata.screen.slice(
+                SCREEN_PREFIX.length
+              ) === id &&
+              !("options" in state.currentResult) &&
+              !("command" in state.currentResult) &&
+              !state.currentResult?.markup?.find(
+                (tag) =>
+                  tag.name === "character" &&
+                  tag.properties.name.toLowerCase() === PLAYER_ID
+              ) ? (
+                <span className="indicator-item badge badge-secondary text-secondary-content">
+                  1
+                </span>
+              ) : null}
+              <Link
+                to={`/contacts/${id}`}
+                className="btn btn-circle btn-primary p-1 size-12"
+              >
+                <span className="sr-only">Chat</span>
+                <ChatBubbleOvalLeftIcon
+                  role="presentation"
+                  title="Chat"
+                  className=""
+                />
+              </Link>
+            </div>
           </li>
         ))}
       </ul>
