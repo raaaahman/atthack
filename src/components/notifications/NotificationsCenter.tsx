@@ -76,7 +76,7 @@ function Notifications({
 
   const conversationId =
     typeof snap.currentResult?.metadata.screen === "string" &&
-    snap.currentResult.metadata.screen.match(/conversation_(\w+)/)?.at(1);
+    snap.currentResult.metadata.screen.match(/([A-Za-z]+)_([A-Za-z]+)/)?.at(1);
 
   useEffect(() => {
     {
