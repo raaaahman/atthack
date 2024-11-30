@@ -25,7 +25,7 @@ export function StoryNotification({
         color === "error" ? "alert-error text-error-content" : "",
         color === "success" ? "alert-success text-success-content" : "",
         color === "warning" ? "alert-warning text-warning-content" : "",
-        !color ? "alert-info text-info-content" : ""
+        !color || color === "info" ? "alert-info text-info-content" : ""
       )}
       {...props}
     >
