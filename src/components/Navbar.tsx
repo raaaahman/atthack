@@ -5,10 +5,12 @@ import { SparklesIcon, UserIcon } from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@tanstack/react-router";
 import clsx from "clsx";
+import { useSnapshot } from "valtio";
 
 export const Navbar = () => {
   const pathname = useLocation({ select: (location) => location.pathname });
   const { state } = useDialogue({});
+  const snap = useSnapshot(state);
 
   return (
     <nav className="btm-nav [position:static_!important;]">
@@ -25,15 +27,15 @@ export const Navbar = () => {
       <button className={clsx(pathname === "/contacts" ? "active" : "")}>
         <div className="indicator">
           {!pathname.startsWith("/contacts") &&
-          typeof state.currentResult?.metadata.screen === "string" &&
-          state.currentResult.metadata.screen.startsWith(
+          typeof snap.currentResult?.metadata.screen === "string" &&
+          snap.currentResult.metadata.screen.startsWith(
             screenName("/contacts/") || "conversation_"
           ) &&
-          state.currentResult?.markup
+          snap.currentResult?.markup
             ?.find((tag) => tag.name === "character")
             ?.properties.name.toLowerCase() !== PLAYER_ID &&
-          !("options" in state.currentResult) &&
-          !("command" in state.currentResult) ? (
+          !("options" in snap.currentResult) &&
+          !("command" in snap.currentResult) ? (
             <span className="indicator-item badge badge-secondary">1</span>
           ) : null}
           <Link className="block" to="/contacts">
@@ -48,16 +50,16 @@ export const Navbar = () => {
       </button>
       <button className={clsx(pathname === "/ai" ? "active" : "")}>
         <div className="indicator">
-          {!pathname.startsWith("/contacts") &&
-          typeof state.currentResult?.metadata.screen === "string" &&
-          state.currentResult.metadata.screen.startsWith(
+          {!pathname.startsWith("/ai") &&
+          typeof snap.currentResult?.metadata.screen === "string" &&
+          snap.currentResult.metadata.screen.startsWith(
             screenName("/ai/") || "ai_"
           ) &&
-          state.currentResult?.markup
+          snap.currentResult?.markup
             ?.find((tag) => tag.name === "character")
             ?.properties.name.toLowerCase() !== PLAYER_ID &&
-          !("options" in state.currentResult) &&
-          !("command" in state.currentResult) ? (
+          !("options" in snap.currentResult) &&
+          !("command" in snap.currentResult) ? (
             <span className="indicator-item badge badge-secondary">1</span>
           ) : null}
           <Link className="block" href="/ai/flemmy">
