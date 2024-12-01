@@ -9,6 +9,7 @@ import { DialogueComponent } from "@/components/dialogue/DialogueComponent";
 import { useDialogue } from "@/contexts/DialogueContext";
 import { useCharacters } from "@/contexts/CharactersContext";
 import { SCREEN_PREFIX } from "./-constants";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 export const Route = createLazyFileRoute("/ai/$modelId")({
   component: RouteComponent,
@@ -25,10 +26,19 @@ function RouteComponent() {
   const characters = useCharacters();
 
   return (
-    <div className="flex-grow flex flex-col">
-      <div className="w-full flex justify-center bg-neutral-100 p-2">
-        <details className="dropdown">
-          <summary className="btn my-2 w-52 font-bold text-lg text-center border border-neutral-300">
+    <>
+      <header className="fixed w-full z-[5] bg-base-100 text-base-content flex justify-between md:justify-center items-center p-2">
+        <Link href="/" className="block md:hidden">
+          <span className="sr-only">Back Home</span>
+          <ChevronLeftIcon
+            title="Back Home"
+            role="presentation"
+            className=" btn btn-circle border border-base-300 bg-base-100"
+          />
+        </Link>
+        <h1 className="sr-only">{characters.getName(modelId)}</h1>
+        <details className="block dropdown">
+          <summary className="btn w-52 font-bold text-lg text-center border border-neutral-300">
             {characters.getName(modelId)}
           </summary>
           {availableModels.length > 1 ? (
@@ -41,8 +51,13 @@ function RouteComponent() {
             </ul>
           ) : null}
         </details>
-      </div>
-      <DialogueComponent state={state} advance={advance} />
-    </div>
+        <div className="md:block md:hidden" />
+      </header>
+      <DialogueComponent
+        state={state}
+        advance={advance}
+        className="container mx-auto mt-16 -p-16"
+      />
+    </>
   );
 }
