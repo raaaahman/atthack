@@ -1,6 +1,5 @@
 import {
   ComponentProps,
-  RefObject,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -18,7 +17,6 @@ import { ChatMessage } from "./ChatMessage";
 import { PLAYER_ID } from "@/constants";
 import { ChatInput } from "./ChatInput";
 import clsx from "clsx";
-import { ArrowDownIcon } from "@heroicons/react/24/outline";
 
 interface DialogueComponentProps {
   state: Pick<YarnBound, "history" | "currentResult">;
@@ -122,7 +120,6 @@ export function DialogueComponent({
             ) : null
           )}
       </ul>
-      <ScrollToBottom elementRef={messagesListRef} />
       <ChatInput
         key={
           (snap.currentResult?.metadata?.screen || "dialogue") +
@@ -133,48 +130,5 @@ export function DialogueComponent({
         advance={advance}
       />
     </div>
-  );
-}
-
-function ScrollToBottom({
-  elementRef,
-}: {
-  elementRef: RefObject<HTMLElement>;
-}) {
-  const [isShown, setIsShown] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsShown(
-        !!elementRef.current &&
-          elementRef.current?.scrollHeight - elementRef.current?.scrollTop ===
-            elementRef.current?.clientHeight
-      );
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <a
-      href="#"
-      className={clsx(
-        "fixed bottom-20 right-0 z-[8] mx-4 bg-base-300 size-12 rounded-full border border-secondary animate-bounce",
-        isShown ? "hidden" : ""
-      )}
-      onClick={() => {
-        elementRef.current?.scrollTo({
-          top: elementRef.current.scrollHeight,
-          behavior: "smooth",
-        });
-      }}
-    >
-      <span className="sr-only">Go to last message</span>
-      <ArrowDownIcon
-        title="Go to last message"
-        role="presentation"
-        className="text-secondary"
-      />
-    </a>
   );
 }

@@ -86,7 +86,12 @@ export function ChatMessage({ result }: ChatMessageProps) {
           />
         ) : null}
         {characterId && (isPlayer || !characterTag?.properties.as) ? (
-          <Avatar characterId={characterId} />
+          <Avatar
+            characterId={characterId}
+            className={clsx(
+              characterTag?.properties.as ? "grayscale" : "grayscale-0"
+            )}
+          />
         ) : null}
       </div>
       {characterId ? (
