@@ -10,8 +10,6 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@dicebear/collection": "^9.2.2",
-    "@dicebear/core": "^9.2.2",
     "@heroicons/react": "^2.1.5",
     "@tanstack/router": "^0.0.1-beta.53",
     "clsx": "^2.1.1",

@@ -1,7 +1,4 @@
-import { createAvatar } from "@dicebear/core";
 import { IVariablesStorage } from "yarn-bound";
-
-import * as collections from "@dicebear/collection";
 
 const SPECIAL_CHARACTERS = {
   unknown: "incognito-circle.svg",
@@ -9,9 +6,10 @@ const SPECIAL_CHARACTERS = {
   "cryptosecure support": "support-circle.svg",
 };
 
-type AvatarData = {
-  collection: keyof typeof collections;
-  options: Record<string, string | number | boolean>;
+type AvatarResolver = {
+  toString: () => string;
+  toDataUri: () => string;
+  toJson: () => { svg: string; extra: object };
 };
 
 type Request = {
@@ -23,7 +21,7 @@ const ROLE_NAMES = ["SuperAdmin", "Admin", "Teacher", "Student", "Guest"];
 
 export class CharactersRegistry {
   _variables: IVariablesStorage;
-  _avatars = new Map<string, ReturnType<typeof createAvatar>>();
+  _avatars = new Map<string, AvatarResolver>();
   _requests = new Map<string, Request>();
 
   constructor(variables: IVariablesStorage) {
@@ -63,21 +61,21 @@ export class CharactersRegistry {
       : "Guest";
   }
 
-  async preload(characterId: string) {
+  async preload(resourceName: string) {
     const controller = new AbortController();
 
     const isSpecialCharacter =
-      Object.getOwnPropertyNames(SPECIAL_CHARACTERS).includes(characterId);
+      Object.getOwnPropertyNames(SPECIAL_CHARACTERS).includes(resourceName);
 
     const path =
-      "/avatars/" +
+      "avatars/" +
       (isSpecialCharacter
-        ? SPECIAL_CHARACTERS[characterId as keyof typeof SPECIAL_CHARACTERS]
-        : characterId + ".json");
+        ? SPECIAL_CHARACTERS[resourceName as keyof typeof SPECIAL_CHARACTERS]
+        : resourceName);
 
     const request = { status: "fetching", controller } as Request;
 
-    this._requests.set(`${characterId}.avatar`, request);
+    this._requests.set(resourceName, request);
 
     try {
       const response = await fetch(path, { signal: controller.signal });
@@ -91,13 +89,14 @@ export class CharactersRegistry {
           toJson: () => ({ svg: text, extra: {} }),
         }));
       } else {
-        const data = (await response.json()) as AvatarData;
-
-        const collection = collections[data.collection];
-        avatar = createAvatar<typeof collection>(collection, data.options);
+        avatar = {
+          toString: () => "",
+          toDataUri: () => path,
+          toJson: () => ({ svg: "", extra: {} }),
+        };
       }
 
-      this._avatars.set(characterId, avatar);
+      this._avatars.set(resourceName, avatar);
       request.status = "idle";
 
       return avatar;
