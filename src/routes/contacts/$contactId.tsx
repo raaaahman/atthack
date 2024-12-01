@@ -1,10 +1,12 @@
-import { createLazyFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+
 import { DialogueComponent } from "../../components/dialogue/DialogueComponent";
 import { SCREEN_PREFIX } from "./-constants";
 import { useCharacters } from "@/contexts/CharactersContext";
 import { useDialogue } from "@/contexts/DialogueContext";
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-export const Route = createLazyFileRoute("/contacts/$contactId")({
+
+export const Route = createFileRoute("/contacts/$contactId")({
   component: RouteComponent,
 });
 

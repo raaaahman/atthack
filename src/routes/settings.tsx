@@ -1,13 +1,13 @@
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
-import { useRef } from "react";
+import { ChevronLeftIcon } from '@heroicons/react/24/outline'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useRef } from 'react'
 
-export const Route = createLazyFileRoute("/settings")({
+export const Route = createFileRoute('/settings')({
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
-  const modalRef = useRef<HTMLDialogElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null)
   return (
     <>
       <header className="bg-base-100 h-16 flex justify-between md:justify-center items-center p-2">
@@ -40,8 +40,8 @@ function RouteComponent() {
             <button
               className="btn btn-error"
               onClick={() => {
-                window.localStorage.clear();
-                window.location.reload();
+                window.localStorage.clear()
+                window.location.reload()
               }}
             >
               Confirm
@@ -50,5 +50,5 @@ function RouteComponent() {
         </div>
       </dialog>
     </>
-  );
+  )
 }

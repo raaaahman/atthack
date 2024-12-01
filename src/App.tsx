@@ -45,7 +45,7 @@ export function App() {
 
   const [currentScript, setCurrentScript] = useState<string | undefined>(
     local
-      ? "/scripts/" +
+      ? "scripts/" +
           local.currentResult?.metadata.filetags.find((tag?: string) =>
             tag?.endsWith("yarn")
           ) || "index.yarn"
