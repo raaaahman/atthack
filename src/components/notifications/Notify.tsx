@@ -31,7 +31,7 @@ export function Notify({
         ?.properties.name.toLowerCase() !== PLAYER_ID &&
       !("options" in result) &&
       !("command" in result) ? (
-        <span className="indicator-item badge badge-secondary">1</span>
+        <span className="indicator-item z-20 badge badge-secondary">1</span>
       ) : null}
       {children}
     </div>

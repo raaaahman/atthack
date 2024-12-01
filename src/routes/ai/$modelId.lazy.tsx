@@ -51,12 +51,12 @@ function RouteComponent() {
             </ul>
           ) : null}
         </details>
-        <div className="md:block md:hidden" />
+        <div className="block md:hidden" />
       </header>
       <DialogueComponent
         state={state}
         advance={advance}
-        className="container mx-auto mt-16 -p-16"
+        className="container mx-auto pt-16"
       />
     </>
   );
