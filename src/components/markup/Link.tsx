@@ -1,10 +1,18 @@
+import clsx from "clsx";
 import { PropsWithChildren, useRef } from "react";
 
 type LinkProps = {
   href?: string;
+  modalContent?: string;
+  modalTitle?: string;
 };
 
-export function Link({ href, children }: PropsWithChildren<LinkProps>) {
+export function Link({
+  href,
+  children,
+  modalContent,
+  modalTitle,
+}: PropsWithChildren<LinkProps>) {
   const modalRef = useRef<HTMLDialogElement>(null);
 
   return (
@@ -22,16 +30,36 @@ export function Link({ href, children }: PropsWithChildren<LinkProps>) {
       </a>
       <dialog ref={modalRef} className="modal">
         <div className="modal-box bg-neutral-100">
-          <h3 className="font-bold text-lg bg-warning text-warning-content text-center rounded-xl p-4 -m-4">
-            Security Alert!
+          <h3
+            className={clsx(
+              "font-bold text-lg text-center rounded-xl p-4 -m-4",
+              modalTitle
+                ? "bg-info text-info-content"
+                : " bg-warning text-warning-content"
+            )}
+          >
+            {modalTitle ? modalTitle : "Security Alert!"}
           </h3>
           <p className="py-8 text-neutral">
-            <strong className="font-bold">Warning:</strong> This link can't be
-            trusted. We blocking it for your security.
+            {modalContent ? (
+              modalContent
+            ) : (
+              <>
+                <strong className="font-bold">Warning:</strong> This link can't
+                be trusted. We blocking it for your security.
+              </>
+            )}
           </p>
           <div className="modal-action justify-center">
             <form method="dialog">
-              <button className="btn btn-success">Back to safety</button>
+              {modalContent ? (
+                <>
+                  <button className="btn btn-neutral mx-2">Cancel</button>
+                  <button className="btn btn-success mx-2">Confirm</button>
+                </>
+              ) : (
+                <button className="btn btn-success">Back to safety</button>
+              )}
             </form>
           </div>
         </div>

@@ -40,7 +40,7 @@ export function Attachment({ src, children }: PropsWithChildren<AttachmentProps>
   return type === "image" ? (
     resource ? (
       <img
-        className="h-72 w-96 rounded-md"
+        className="w-full object-contain max-h-72 max-w-96 rounded-md"
         alt={typeof children === "string" ? children : "An image."}
         src={resource}
       />
