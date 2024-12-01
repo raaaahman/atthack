@@ -1,11 +1,11 @@
-import { PLAYER_ID } from "@/constants";
-import { useDialogue } from "@/contexts/DialogueContext";
-import { screenName } from "@/utils";
 import { SparklesIcon, UserIcon } from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@tanstack/react-router";
 import clsx from "clsx";
 import { useSnapshot } from "valtio";
+
+import { Notify } from "@/components/notifications/Notify";
+import { useDialogue } from "@/contexts/DialogueContext";
 
 export const Navbar = () => {
   const pathname = useLocation({ select: (location) => location.pathname });
@@ -25,19 +25,7 @@ export const Navbar = () => {
         </Link>
       </button>
       <button className={clsx(pathname === "/contacts" ? "active" : "")}>
-        <div className="indicator">
-          {!pathname.startsWith("/contacts") &&
-          typeof snap.currentResult?.metadata.screen === "string" &&
-          snap.currentResult.metadata.screen.startsWith(
-            screenName("/contacts/") || "conversation_"
-          ) &&
-          snap.currentResult?.markup
-            ?.find((tag) => tag.name === "character")
-            ?.properties.name.toLowerCase() !== PLAYER_ID &&
-          !("options" in snap.currentResult) &&
-          !("command" in snap.currentResult) ? (
-            <span className="indicator-item badge badge-secondary">1</span>
-          ) : null}
+        <Notify route="/contacts" result={snap.currentResult}>
           <Link className="block" to="/contacts">
             <span className="sr-only">Contacts</span>
             <UserIcon
@@ -46,22 +34,10 @@ export const Navbar = () => {
               className="size-8 m-2 md:size-12 md:m-4"
             />
           </Link>
-        </div>
+        </Notify>
       </button>
       <button className={clsx(pathname === "/ai" ? "active" : "")}>
-        <div className="indicator">
-          {!pathname.startsWith("/ai") &&
-          typeof snap.currentResult?.metadata.screen === "string" &&
-          snap.currentResult.metadata.screen.startsWith(
-            screenName("/ai/") || "ai_"
-          ) &&
-          snap.currentResult?.markup
-            ?.find((tag) => tag.name === "character")
-            ?.properties.name.toLowerCase() !== PLAYER_ID &&
-          !("options" in snap.currentResult) &&
-          !("command" in snap.currentResult) ? (
-            <span className="indicator-item badge badge-secondary">1</span>
-          ) : null}
+        <Notify route="/ai" result={snap.currentResult}>
           <Link className="block" href="/ai/flemmy">
             <span className="sr-only">AI Assistant</span>
             <SparklesIcon
@@ -70,7 +46,7 @@ export const Navbar = () => {
               className="size-8 m-2 md:size-12 md:m-4"
             />
           </Link>
-        </div>
+        </Notify>
       </button>
     </nav>
   );
