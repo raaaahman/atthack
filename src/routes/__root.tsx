@@ -40,7 +40,9 @@ function Component() {
       <div className="grow h-dvh flex flex-col">
         <NotificationsCenter screen={screenName(pathname)} />
         <Outlet />
-        <TanStackRouterDevtools />
+        {process.env.NODE_ENV === "development" ? (
+          <TanStackRouterDevtools />
+        ) : null}
       </div>
     </div>
   );
