@@ -37,7 +37,7 @@ function Component() {
       >
         <Navbar />
       </aside>
-      <div className="grow h-dvh flex flex-col">
+      <div className="grow w-full h-dvh flex flex-col">
         <NotificationsCenter screen={screenName(pathname)} />
         <Outlet />
         {process.env.NODE_ENV === "development" ? (
