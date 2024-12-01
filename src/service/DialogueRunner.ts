@@ -44,7 +44,11 @@ export class DialogueRunner extends YarnBound {
 
     runner.history = serialized.history;
 
-    runner.currentResult = serialized.currentResult;
+    if (runner.currentResult && "options" in runner.currentResult)
+      runner.currentResult.select = (index = -1) => {
+        // @ts-ignore
+        runner.currentResult.selected = index;
+      };
 
     return runner;
   }
