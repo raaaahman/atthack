@@ -1,15 +1,13 @@
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSnapshot } from "valtio";
+import ChatBubbleOvalLeftIcon from "@heroicons/react/24/outline/ChatBubbleOvalLeftIcon";
+import SparklesIcon from "@heroicons/react/24/outline/SparklesIcon";
+import WrenchScrewdriverIcon from "@heroicons/react/24/outline/WrenchScrewdriverIcon";
 
 import { useDialogue } from "@/contexts/DialogueContext";
 import { Notify } from "@/components/notifications/Notify";
-import { useSnapshot } from "valtio";
-import {
-  ChatBubbleOvalLeftIcon,
-  SparklesIcon,
-  WrenchScrewdriverIcon,
-} from "@heroicons/react/24/outline";
 
-export const Route = createLazyFileRoute("/")({
+export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
 
