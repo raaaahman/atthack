@@ -42,11 +42,7 @@ export function ChatInput({ result, advance }: ChatInputProps) {
         tag.properties.name.toLowerCase() === PLAYER_ID
     );
   return (
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      className="w-full max-w-lg m-auto "
-    >
+    <form ref={formRef} onSubmit={handleSubmit} className="w-full m-auto px-4">
       {result && "options" in result ? (
         <>
           <input type="hidden" name="option" value={-1} />
