@@ -48,7 +48,7 @@ declare module "yarn-bound" {
   export type OptionsResult = BaseResult & {
     text?: string;
     options: OptionResult[];
-    select: (index: number) => OptionResult;
+    select: (index: number) => void;
   };
 
   export type YarnNode = {
