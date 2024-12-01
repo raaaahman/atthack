@@ -33,7 +33,7 @@ export function DialogueComponent({
 }: ComponentProps<"div"> & DialogueComponentProps) {
   const snap = useSnapshot(state);
   const [currentResult, setCurrentResult] = useState<Immutable<
-    Partial<TextResult | OptionsResult | CommandResult>
+    TextResult | OptionsResult | CommandResult
   > | null>(snap.currentResult);
 
   const isPlayer = snap.currentResult?.markup?.find(
@@ -105,25 +105,22 @@ export function DialogueComponent({
         ref={messagesListRef}
         className="grow overflow-y-scroll scroll-smooth"
       >
-        {(
-          snap.history.filter((result) => "text" in result) as Immutable<
-            OptionsResult | TextResult
-          >[]
-        ).map((result, i) => (
-          <ChatMessage key={result.metadata.screen + "-" + i} result={result} />
-        ))}
-        {currentResult &&
-        !("options" in currentResult) &&
-        !("command" in currentResult) ? (
-          <ChatMessage
-            key={
-              (currentResult.metadata?.screen || "dialogue") +
-              "-" +
-              snap.history.length
-            }
-            result={currentResult}
-          />
-        ) : null}
+        {snap.history
+          .concat(
+            currentResult &&
+              !("options" in currentResult) &&
+              !("command" in currentResult)
+              ? currentResult
+              : []
+          )
+          .map((result, i) =>
+            "text" in result ? (
+              <ChatMessage
+                key={result.metadata.screen + "-" + i}
+                result={result}
+              />
+            ) : null
+          )}
       </ul>
       <ScrollToBottom elementRef={messagesListRef} />
       <ChatInput
