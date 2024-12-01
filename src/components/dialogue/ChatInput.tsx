@@ -4,8 +4,8 @@ import clsx from "clsx";
 
 import { useVariableStorage } from "@/contexts/VariableStorageContext";
 import { Immutable } from "@/types/Immutable";
-import EnvelopeIcon from "@heroicons/react/24/outline/EnvelopeIcon";
 import { PLAYER_ID } from "@/constants";
+import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
 interface ChatInputProps {
   result: Immutable<YarnBound["currentResult"]>;
@@ -30,7 +30,7 @@ export function ChatInput({ result, advance }: ChatInputProps) {
       );
       advance();
       setIsValidInput(false);
-    } 
+    }
   };
 
   const isFromPlayer =
@@ -46,11 +46,11 @@ export function ChatInput({ result, advance }: ChatInputProps) {
       {result && "options" in result ? (
         <>
           <input type="hidden" name="option" value={-1} />
-          <div className="flex flex-row flex-wrap chat-end justify-start">
+          <div className="max-w-xl mx-auto flex flex-row flex-wrap justify-start chat-end ">
             {result.options.map((option, index) => (
               <button
                 className={clsx(
-                  "basis-1/2 chat-bubble hover:chat-bubble-primary",
+                  "basis-1/2 grow chat-bubble hover:chat-bubble-primary",
                   option.isAvailable ? "" : "hidden"
                 )}
                 key={option.text}
@@ -124,7 +124,7 @@ export function ChatInput({ result, advance }: ChatInputProps) {
           )}
           disabled={!isValidInput && !isFromPlayer}
         >
-          <EnvelopeIcon title="Send" role="presentation" />
+          <PaperAirplaneIcon title="Send" role="presentation" />
         </button>
       </div>
     </form>

@@ -37,8 +37,7 @@ function RouteComponent() {
         </h1>
         <div className="w-12 md:hidden" />
       </header>
-
-      <ul className="bg-neutral-300 px-4 flex-grow mt-16">
+      <ul className="container mx-auto bg-neutral-300 px-4 flex-grow mt-16">
         {data.map(({ id, name, role }) => (
           <li
             key={id}

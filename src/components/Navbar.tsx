@@ -1,53 +1,57 @@
-import { SparklesIcon, UserIcon } from "@heroicons/react/24/outline";
+import {
+  ChatBubbleOvalLeftIcon,
+  SparklesIcon,
+  WrenchScrewdriverIcon,
+} from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/outline";
-import { Link, useLocation } from "@tanstack/react-router";
-import clsx from "clsx";
+import { Link } from "@tanstack/react-router";
 import { useSnapshot } from "valtio";
 
 import { Notify } from "@/components/notifications/Notify";
 import { useDialogue } from "@/contexts/DialogueContext";
 
 export const Navbar = () => {
-  const pathname = useLocation({ select: (location) => location.pathname });
   const { state } = useDialogue({});
   const snap = useSnapshot(state);
 
   return (
-    <nav className="btm-nav [position:static_!important;]">
-      <button className={clsx(pathname === "/" ? "active" : "")}>
-        <Link to="/">
-          <span className="sr-only">Home</span>
-          <HomeIcon
-            title="Home"
+    <nav className="menu bg-base-100 h-full flex flex-col">
+      <Link to="/" className="btn btn-square btn-neutral m-1">
+        <span className="sr-only">Home</span>
+        <HomeIcon
+          title="Home"
+          role="presentation"
+          className="size-8 m-2 md:size-10"
+        />
+      </Link>
+      <Notify route="/contacts" result={snap.currentResult}>
+        <Link className="btn btn-square btn-neutral m-1" to="/contacts">
+          <span className="sr-only">Messages</span>
+          <ChatBubbleOvalLeftIcon
+            title="Messages"
             role="presentation"
-            className="size-8 m-2 md:size-12 md:m-4"
+            className="size-8 m-2 md:size-10"
           />
         </Link>
-      </button>
-      <button className={clsx(pathname === "/contacts" ? "active" : "")}>
-        <Notify route="/contacts" result={snap.currentResult}>
-          <Link className="block" to="/contacts">
-            <span className="sr-only">Contacts</span>
-            <UserIcon
-              title="Contacts"
-              role="presentation"
-              className="size-8 m-2 md:size-12 md:m-4"
-            />
-          </Link>
-        </Notify>
-      </button>
-      <button className={clsx(pathname === "/ai" ? "active" : "")}>
-        <Notify route="/ai" result={snap.currentResult}>
-          <Link className="block" href="/ai/flemmy">
-            <span className="sr-only">AI Assistant</span>
-            <SparklesIcon
-              title="AI Assistant"
-              role="presentation"
-              className="size-8 m-2 md:size-12 md:m-4"
-            />
-          </Link>
-        </Notify>
-      </button>
+      </Notify>
+      <Notify route="/ai" result={snap.currentResult}>
+        <Link className="btn btn-square btn-neutral m-1" href="/ai/flemmy">
+          <span className="sr-only">AI Assistant</span>
+          <SparklesIcon
+            title="AI Assistant"
+            role="presentation"
+            className="size-8 m-2 md:size-10"
+          />
+        </Link>
+      </Notify>
+      <Link href="/settings" className="btn btn-square btn-neutral m-1">
+        <span className="sr-only">Settings</span>
+        <WrenchScrewdriverIcon
+          title="Settings"
+          role="presentation"
+          className="size-8 m-2 md:size-10"
+        />
+      </Link>
     </nav>
   );
 };
