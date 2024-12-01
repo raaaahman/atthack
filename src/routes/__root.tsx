@@ -6,7 +6,6 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import YarnBound, { IVariablesStorage } from "yarn-bound";
 
-import { Navbar } from "@/components/Navbar";
 import { IProject } from "@/types/IProject";
 import { CharactersRegistry } from "@/service/CharactersRegistry";
 import { NotificationsCenter } from "@/components/notifications/NotificationsCenter";
@@ -27,15 +26,10 @@ function Component() {
   const { pathname } = useLocation();
 
   return (
-    <>
+    <div className="h-dvh flex flex-col">
       <NotificationsCenter screen={screenName(pathname)} />
-      <header className="order-3">
-        <Navbar />
-      </header>
-      <main className="flex-grow flex flex-col order-1">
-        <Outlet />
-      </main>
+      <Outlet />
       <TanStackRouterDevtools />
-    </>
+    </div>
   );
 }

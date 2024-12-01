@@ -39,7 +39,3 @@ body {
   margin: 0;
   @apply bg-neutral-300;
 }
-
-#root {
-  @apply container mx-auto flex flex-col min-h-dvh;
-}

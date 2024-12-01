@@ -3,7 +3,10 @@ import {
   Link,
   useLoaderData,
 } from "@tanstack/react-router";
-import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
+import {
+  ChatBubbleOvalLeftIcon,
+  ChevronLeftIcon,
+} from "@heroicons/react/24/outline";
 
 import { Avatar } from "@/components/Avatar";
 import { useDialogue } from "@/contexts/DialogueContext";
@@ -20,10 +23,22 @@ function RouteComponent() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-center p-2 shadow-sm bg-neutral-100">
-        Contacts
-      </h1>
-      <ul className="bg-neutral-300 px-4 flex-grow">
+      <header className="fixed w-full z-[5] h-16 p-2 bg-base-100 flex justify-between md:justify-center items-center">
+        <Link href="/" className="block md:hidden">
+          <span className="sr-only">Back Home</span>
+          <ChevronLeftIcon
+            title="Back Home"
+            role="presentation"
+            className="btn btn-circle bg-base-100 border-base-300"
+          />
+        </Link>
+        <h1 className="text-2xl font-bold text-center p-2 shadow-sm">
+          Contacts
+        </h1>
+        <div className="w-12 md:hidden" />
+      </header>
+
+      <ul className="bg-neutral-300 px-4 flex-grow mt-16">
         {data.map(({ id, name, role }) => (
           <li
             key={id}
