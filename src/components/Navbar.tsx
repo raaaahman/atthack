@@ -15,42 +15,26 @@ export const Navbar = () => {
   const snap = useSnapshot(state);
 
   return (
-    <nav className="menu bg-base-100 h-full flex flex-col">
-      <Link to="/" className="btn btn-square btn-neutral m-1">
+    <nav className="menu bg-base-100 h-full flex flex-col z-[12]">
+      <Link to="/" className="btn btn-square btn-neutral m-1 p-1">
         <span className="sr-only">Home</span>
-        <HomeIcon
-          title="Home"
-          role="presentation"
-          className="size-8 m-2 md:size-10"
-        />
+        <HomeIcon title="Home" role="presentation" />
       </Link>
       <Notify route="/contacts" result={snap.currentResult}>
-        <Link className="btn btn-square btn-neutral m-1" to="/contacts">
+        <Link className="btn btn-square btn-neutral m-1 p-1" to="/contacts">
           <span className="sr-only">Messages</span>
-          <ChatBubbleOvalLeftIcon
-            title="Messages"
-            role="presentation"
-            className="size-8 m-2 md:size-10"
-          />
+          <ChatBubbleOvalLeftIcon title="Messages" role="presentation" />
         </Link>
       </Notify>
       <Notify route="/ai" result={snap.currentResult}>
-        <Link className="btn btn-square btn-neutral m-1" href="/ai/flemmy">
+        <Link className="btn btn-square btn-neutral m-1 p-1" href="/ai/flemmy">
           <span className="sr-only">AI Assistant</span>
-          <SparklesIcon
-            title="AI Assistant"
-            role="presentation"
-            className="size-8 m-2 md:size-10"
-          />
+          <SparklesIcon title="AI Assistant" role="presentation" />
         </Link>
       </Notify>
-      <Link href="/settings" className="btn btn-square btn-neutral m-1">
+      <Link href="/settings" className="btn btn-square btn-neutral m-1 p-1">
         <span className="sr-only">Settings</span>
-        <WrenchScrewdriverIcon
-          title="Settings"
-          role="presentation"
-          className="size-8 m-2 md:size-10"
-        />
+        <WrenchScrewdriverIcon title="Settings" role="presentation" />
       </Link>
     </nav>
   );
