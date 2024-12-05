@@ -30,8 +30,11 @@ The _Content_ (story, interactive scripts, character names, fictive places, logo
 
 ## Credits
 
+- [YarnBound by @mnbroatch](https://github.com/mnbroatch/yarn-bound)
+- [DaisyUI by Pouya Saadeeghi](https://daisyui.com/) ([MIT](https://github.com/saadeghi/daisyui/blob/master/LICENSE))
 - [Big Smile by Ashley Seo](https://www.figma.com/community/file/881358461963645496) ([CCBY 4.0](https://creativecommons.org/licenses/by/4.0/))
-- [Bottts by Pablo Stanley](https://bottts.com/) (Free for personal and commercial use)
+- [Thumbs by Dicebear](https://www.dicebear.com/) ([CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/))
+- [shapes by Dicebear](https://www.dicebear.com/) ([CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/))
 
 ## Disclaimer
 
