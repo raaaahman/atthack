@@ -73,11 +73,20 @@ export function App() {
     return () => controller.abort();
   }, []);
 
+  const endModalRef = useRef<HTMLDialogElement>(null);
+
   useEffect(() => {
     let lastTitle = dialogue?.currentResult?.metadata.title;
 
-    if (project && dialogue)
-      return subscribeKey(dialogue, "currentResult", () => {
+    if (project && dialogue) {
+      const unsubscribe = subscribeKey(dialogue, "currentResult", () => {
+        if (
+          dialogue.currentResult &&
+          "command" in dialogue.currentResult &&
+          dialogue.currentResult.command === "pause"
+        )
+          endModalRef.current?.showModal();
+
         if (dialogue.currentResult?.metadata.title !== lastTitle) {
           storage.saveItems();
           lastTitle = dialogue.currentResult?.metadata.title;
@@ -105,11 +114,21 @@ export function App() {
             const currentIndex = project.sourceScripts.findIndex(
               (path) => path === currentScript
             );
-            return currentIndex < project.sourceScripts.length
+
+            return currentIndex < project.sourceScripts.length - 1
               ? project.sourceScripts[currentIndex + 1]
               : currentScript;
           });
       });
+
+      if (
+        dialogue.currentResult &&
+        "command" in dialogue.currentResult &&
+        dialogue.currentResult.command.startsWith("wait")
+      )
+        dialogue.advance();
+      return unsubscribe;
+    }
   }, [project, dialogue]);
 
   useEffect(() => {
@@ -189,6 +208,28 @@ export function App() {
           <p>Oops. Something went wrong. Try refreshing the page.</p>
         </div>
       ) : null}
+      <dialog ref={endModalRef} className="modal">
+        <div className="modal-box">
+          <strong className="block text-lg font-semibold">
+            Thank you for playing!
+          </strong>
+          <p>
+            That game was made in a month for the{" "}
+            <a href="https://itch.io/jam/game-off-2024">
+              GithHub Game Off 2024
+            </a>{" "}
+            game jam. We had to cut some corners to make it fit the schedule.
+          </p>
+          <p>
+            The story does not reach the end we envisionned! If you want to know
+            how everything ends, stay tuned for future updates.
+          </p>
+          <p>Cheers.</p>
+          <form method="dialog" className="modal-action">
+            <button className="btn btn-success">Okay</button>
+          </form>
+        </div>
+      </dialog>
     </>
   );
 }
