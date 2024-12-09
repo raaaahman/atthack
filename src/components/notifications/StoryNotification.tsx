@@ -19,6 +19,7 @@ export function StoryNotification({
 
   return (
     <div
+      role="status"
       className={clsx(
         className,
         "flex justify-between alert",

@@ -208,7 +208,7 @@ export function App() {
           <p>Oops. Something went wrong. Try refreshing the page.</p>
         </div>
       ) : null}
-      <dialog ref={endModalRef} className="modal">
+      <dialog ref={endModalRef} className="modal" role="alertdialog">
         <div className="modal-box">
           <strong className="block text-lg font-semibold">
             Thank you for playing!
