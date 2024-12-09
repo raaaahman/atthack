@@ -19,6 +19,7 @@ export function CharacterNotification({
 
   return (
     <div
+      role="status"
       className={clsx(
         className,
         "alert bg-secondary text-secondary-content flex justify-around"

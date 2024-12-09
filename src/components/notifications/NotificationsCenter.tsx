@@ -111,7 +111,6 @@ function Notifications({
             ?.find((tag) => tag.name === "character")
             ?.properties.name.toLowerCase()}
           className={route ? "cursor-pointer" : "cursor-auto"}
-          role={route ? "link" : ""}
           onClick={
             route
               ? () => {

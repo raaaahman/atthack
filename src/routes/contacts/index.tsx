@@ -102,9 +102,10 @@ function RouteComponent() {
               ) : null}
               <Link
                 to={`/contacts/${id}`}
+                title={`Chat with ${name}`}
                 className="btn btn-circle btn-primary p-1 size-12"
               >
-                <span className="sr-only">Chat</span>
+                <span className="sr-only">Chat with {name}</span>
                 <ChatBubbleOvalLeftIcon
                   role="presentation"
                   title="Chat"
