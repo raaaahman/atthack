@@ -7,7 +7,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:e2e": "playwright test --ui"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@playwright/test": "^1.49.0",
     "@tanstack/eslint-plugin-router": "^1.77.7",
     "@tanstack/router-devtools": "^1.78.3",
     "@tanstack/router-plugin": "^1.78.3",
@@ -39,6 +41,7 @@
     "globals": "^15.11.0",
     "jsdom": "^25.0.1",
     "msw": "^2.6.6",
+    "playwright": "^1.49.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "typescript": "~5.6.2",
