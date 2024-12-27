@@ -27,6 +27,12 @@ Scout: How do you do?
   Pulse: Hello mate!
 -> Say Nothing
   Pulse: ...
+<<jump Another_Node>>
+===
+title: Another_Node
+screen: conversation_scout
+---
+Scout: Let's get the party started!
 ===`;
 
 const SECOND_SCRIPT = `#second.yarn
@@ -44,7 +50,7 @@ Whisper: Let's hack back!
 ===
 `;
 
-test("Can navigate to specific contact", async ({ page }) => {
+test("Dialogue feature", async ({ page }) => {
   await page.route("*/**/project.json", async (route) => {
     const response = await route.fetch();
 
@@ -92,6 +98,20 @@ test("Can navigate to specific contact", async ({ page }) => {
   await page.getByText("Say Hello").click();
 
   await expect(page.getByText("Hello mate!")).toBeInViewport();
+
+  // Next node
+  await page.getByRole("list").click();
+
+  await expect(page.getByText("Let's get the party started!")).toBeInViewport();
+
+  // Save and load
+  await page.reload();
+
+  await page.getByRole("link", { name: /messages/i }).click();
+
+  await page.getByRole("link", { name: /scout/i }).click();
+
+  await expect(page.getByText("Let's get the party started!")).toBeInViewport();
 
   // Next script
   await page.getByRole("list").click();
