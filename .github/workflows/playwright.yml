@@ -11,14 +11,9 @@ jobs:
 
     services:
       web:
-        image: node:18
+        image: node:lts
         ports:
           - 5173:5173
-        options: >-
-          --health-cmd "curl --fail http://localhost:5173 || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
           
     steps:
     - uses: actions/checkout@v4
