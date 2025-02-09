@@ -8,12 +8,6 @@ jobs:
   e2e-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-
-    services:
-      web:
-        image: node:lts
-        ports:
-          - 5173:5173
           
     steps:
     - uses: actions/checkout@v4
