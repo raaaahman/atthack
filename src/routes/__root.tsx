@@ -6,7 +6,6 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import YarnBound, { IVariablesStorage } from "yarn-bound";
 
-import { IProject } from "@/types/IProject";
 import { CharactersRegistry } from "@/service/CharactersRegistry";
 import { NotificationsCenter } from "@/components/notifications/NotificationsCenter";
 import { screenName } from "@/utils";
@@ -14,7 +13,6 @@ import { Navbar } from "@/components/Navbar";
 import clsx from "clsx";
 
 interface RootContext {
-  project: IProject | null;
   variables: IVariablesStorage;
   dialogue: YarnBound | null;
   characters: CharactersRegistry;
