@@ -1,15 +1,9 @@
 import { test, expect } from "@playwright/test";
-
-const PROJECT = {
-  projectFileVersion: "2.0",
-  sourceScripts: ["first.yarn", "second.yarn"],
-  baseLanguage: "en",
-  localisation: {},
-};
+import convertYarnToJS from "../dev/src/convert-yarn-to-js";
 
 const FIRST_SCRIPT = `#first.yarn
 #v0.0.0
-title: Mission_Start
+title: Start
 screen: conversation_scout
 ---
 <<set $pulse_name = "Pulse">>
@@ -33,6 +27,7 @@ title: Another_Node
 screen: conversation_scout
 ---
 Scout: Let's get the party started!
+<<jump Mission_Start>>
 ===`;
 
 const SECOND_SCRIPT = `#second.yarn
@@ -50,29 +45,29 @@ Whisper: Let's hack back!
 ===
 `;
 
-test("Dialogue feature", async ({ page }) => {
-  await page.route("*/**/project.json", async (route) => {
-    const response = await route.fetch();
+const program = convertYarnToJS(FIRST_SCRIPT).concat(
+  convertYarnToJS(SECOND_SCRIPT)
+);
 
-    await route.fulfill({
-      response,
-      json: PROJECT,
-    });
+test("Dialogue feature", async ({ context, browser }) => {
+  await context.close();
+
+  // We have to bypass the service worker set by our Vite Yarn Plugin
+  context = await browser.newContext({
+    serviceWorkers: "block",
   });
 
-  await page.route("**/*.yarn", async (route, request) => {
-    let body: string = "";
-    if (request.url().match("first")) body = FIRST_SCRIPT;
-    else body = SECOND_SCRIPT;
-
+  context.route("**/YarnNodes.json", async (route) => {
     await route.fulfill({
       status: 200,
-      body,
+      body: JSON.stringify(program),
       headers: {
-        "content-type": "text/plain",
+        "content-type": "application/json",
       },
     });
   });
+
+  const page = await context.newPage();
 
   await page.goto("/");
 

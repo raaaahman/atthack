@@ -1,10 +1,9 @@
 import { RouterProvider } from "@tanstack/react-router";
-import { use, useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef } from "react";
 import { proxy } from "valtio";
 import { subscribeKey } from "valtio/utils";
 
 import { router } from "@/router";
-import { loadProject } from "@/queries/loadProject";
 import { VariableStorageContext } from "@/contexts/VariableStorageContext";
 import { DialogueContext } from "@/contexts/DialogueContext";
 import { CharactersContext } from "@/contexts/CharactersContext";
@@ -15,14 +14,11 @@ import { DialogueRunner, isDialogueRunner } from "@/service/DialogueRunner";
 
 const storage = new LocalStorageManager({});
 
-const fetchProject = loadProject();
-
 const variableStorage = storage.getItem("variables", (data) =>
   isVariables(data) ? new MemoryVariables(data) : new MemoryVariables()
 );
 
 const dialogueOptions = {
-  startAt: "Mission_Start",
   variableStorage: variableStorage,
   combineTextAndOptionsResults: false,
 };
@@ -31,34 +27,29 @@ const local = storage.getItem("dialogue", (data) =>
   isDialogueRunner(data) ? DialogueRunner.fromJSON(data, dialogueOptions) : null
 );
 
-const initDialogue = local
-  ? Promise.resolve(local as DialogueRunner)
-  : fetchProject
-      .then((project) => fetch(project.sourceScripts[0]))
-      .then((response) => response.text())
-      .then((data) => {
-        const dialogue = new DialogueRunner({
-          ...dialogueOptions,
-          dialogue: data,
-        });
-
-        storage.setItem("dialogue", dialogue);
-
-        return dialogue;
+const initDialogue = fetch("YarnNodes.json")
+  .then((response) => response.json())
+  .then((data) => {
+    if (local) {
+      local.runner = new local.bondage.Runner();
+      local.runner.setVariableStorage(variableStorage);
+      local.runner.load(data);
+      return local;
+    } else {
+      const dialogue = new DialogueRunner({
+        ...dialogueOptions,
+        dialogue: data,
       });
 
+      storage.setItem("dialogue", dialogue);
+      return dialogue;
+    }
+  });
+
 export function App() {
-  const project = use(fetchProject);
   const variables = useRef(variableStorage);
   const dialogue = useRef(proxy(use(initDialogue))).current;
   const characters = useRef(new CharactersRegistry(variables.current));
-
-  const [currentScript, setCurrentScript] = useState<string | undefined>(
-    "scripts/" +
-      dialogue.currentResult?.metadata.filetags.find((tag?: string) =>
-        tag?.endsWith("yarn")
-      )
-  );
 
   const endModalRef = useRef<HTMLDialogElement>(null);
 
@@ -92,19 +83,6 @@ export function App() {
           ) * 1000
         );
       }
-
-      if (!currentScript) return;
-
-      if (dialogue.currentResult?.isDialogueEnd)
-        setCurrentScript((currentScript) => {
-          const currentIndex = project.sourceScripts.findIndex(
-            (path) => path === currentScript
-          );
-
-          return currentIndex < project.sourceScripts.length - 1
-            ? project.sourceScripts[currentIndex + 1]
-            : currentScript;
-        });
     });
 
     if (
@@ -115,34 +93,6 @@ export function App() {
       dialogue.advance();
     return unsubscribe;
   }, []);
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    dialogue.runner = new dialogue.bondage.Runner();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    dialogue.runner.noEscape = true;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    dialogue.runner.setVariableStorage(variables.current);
-
-    if (currentScript) {
-      if (process.env.NODE_ENV === "development") console.log(dialogue);
-      const controller = new AbortController();
-
-      fetch(currentScript, { signal: controller.signal })
-        .then((response) => response.text())
-        .then((script) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          dialogue.runner.load(script);
-          dialogue.jump(dialogueOptions.startAt);
-        });
-
-      return () => controller.abort();
-    }
-  }, [currentScript]);
 
   const context = {
     variables: variables.current,
