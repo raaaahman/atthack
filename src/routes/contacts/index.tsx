@@ -61,7 +61,7 @@ function RouteComponent() {
   return (
     <>
       <header className="fixed w-full z-[5] h-16 p-2 bg-base-100 flex justify-between md:justify-center items-center">
-        <Link href="/" className="block md:hidden">
+        <Link to="/" className="block md:hidden">
           <span className="sr-only">Back Home</span>
           <ChevronLeftIcon
             title="Back Home"
@@ -101,7 +101,8 @@ function RouteComponent() {
                 </span>
               ) : null}
               <Link
-                to={`/contacts/${id}`}
+                to={`/contacts/$contactId`}
+                params={{ contactId: id }}
                 title={`Chat with ${name}`}
                 className="btn btn-circle btn-primary p-1 size-12"
               >
