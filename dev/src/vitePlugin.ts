@@ -21,6 +21,7 @@ export const vitePluginYarn = (
 ): Plugin => {
   const options = Object.assign(defaultOptions, pluginOptions || {});
 
+  let publicDir: string;
   let projectData: IProject;
   let parse: (projectData: IProject) => Promise<ParserNode[]>;
 
@@ -28,10 +29,8 @@ export const vitePluginYarn = (
     name: "vite-plugin-yarn",
 
     async buildStart() {
-      const projectPath = path.resolve(
-        this.environment.config.publicDir,
-        options.projectFile
-      );
+      publicDir = this.environment.config.publicDir;
+      const projectPath = path.resolve(publicDir, options.projectFile);
 
       projectData = JSON.parse(
         (await fs.readFile(projectPath, { encoding: "utf-8" })).toString()
@@ -75,6 +74,20 @@ export const vitePluginYarn = (
 
         next();
       });
+    },
+
+    handleHotUpdate({ server, file, modules }) {
+      if (
+        projectData.sourceScripts.includes(file.replace(publicDir + "/", ""))
+      ) {
+        server.ws.send({
+          type: "full-reload",
+          triggeredBy: "vite-plugin-yarn",
+        });
+        return [];
+      }
+
+      return modules;
     },
   };
 };
