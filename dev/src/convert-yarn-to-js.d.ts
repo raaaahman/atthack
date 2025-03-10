@@ -1,13 +1,11 @@
-declare namespace convertYarnToJS {
-  export type YarnNode = {
-    [key: string]: string;
-  } & {
-    title: string;
-    body: string;
-    fileTags: string[];
-  };
-}
+export type ParserNode = {
+  [key: string]: string;
+} & {
+  title: string;
+  body: string;
+  filetags: string[];
+};
 
-declare function convertYarnToJS(content: string): YarnNode[];
+declare function convertYarnToJS(content: string): ParserNode[];
 
-export = convertYarnToJS;
+export default convertYarnToJS;

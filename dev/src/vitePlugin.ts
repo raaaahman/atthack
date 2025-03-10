@@ -4,7 +4,7 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
 import { IProject } from "../../src/types/IProject";
-import convertYarnToJS, { YarnNode } from "./convert-yarn-to-js";
+import convertYarnToJS, { ParserNode } from "./convert-yarn-to-js";
 
 export type VitePluginYarnOptions = {
   projectFile?: string;
@@ -22,7 +22,7 @@ export const vitePluginYarn = (
   const options = Object.assign(defaultOptions, pluginOptions || {});
 
   let projectData: IProject;
-  let parse: (projectData: IProject) => Promise<YarnNode[]>;
+  let parse: (projectData: IProject) => Promise<ParserNode[]>;
 
   return {
     name: "vite-plugin-yarn",
@@ -37,13 +37,16 @@ export const vitePluginYarn = (
         (await fs.readFile(projectPath, { encoding: "utf-8" })).toString()
       );
 
+      projectData.sourceScripts.forEach((file) =>
+        this.addWatchFile(path.resolve(projectPath, file))
+      );
+
       parse = parseYarnFiles.bind(this);
     },
 
-    async buildEnd() {
+    async closeBundle() {
       const outPath = path.resolve(
         this.environment.config.build.outDir,
-        this.environment.config.build.assetsDir,
         options.outputName
       );
 
@@ -51,9 +54,15 @@ export const vitePluginYarn = (
 
       const content = JSON.stringify(nodes);
 
-      await fs.writeFile(outPath, content);
+      await fs.writeFile(outPath, content, {
+        encoding: "utf-8",
+      });
 
-      this.info(nodes.length + " nodes parsed.");
+      this.info(nodes.length + " Yarn nodes parsed.");
+
+      for (const file of projectData.sourceScripts) {
+        await fs.rm(path.resolve(this.environment.config.build.outDir, file));
+      }
     },
 
     configureServer(server) {
@@ -71,7 +80,7 @@ export const vitePluginYarn = (
 };
 
 async function parseYarnFiles(this: PluginContext, projectData: IProject) {
-  let nodes: YarnNode[] = [];
+  let nodes: ParserNode[] = [];
 
   for (const file of projectData.sourceScripts) {
     const filepath = path.resolve(
