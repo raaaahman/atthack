@@ -2,6 +2,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import { use, useEffect, useRef } from "react";
 import { proxy } from "valtio";
 import { subscribeKey } from "valtio/utils";
+import GUI from "lil-gui";
 
 import { router } from "@/router";
 import { VariableStorageContext } from "@/contexts/VariableStorageContext";
@@ -11,12 +12,14 @@ import { CharactersRegistry } from "@/service/CharactersRegistry";
 import { LocalStorageManager } from "@/service/LocalStorageManager";
 import { isVariables, MemoryVariables } from "@/service/MemoryVariables";
 import { DialogueRunner, isDialogueRunner } from "@/service/DialogueRunner";
+import { ParserNode } from "../dev/src/convert-yarn-to-js";
+import { isProject } from "./types/IProject";
 
 const storage = new LocalStorageManager({});
 
 const variableStorage = storage.getItem("variables", (data) =>
   isVariables(data) ? new MemoryVariables(data) : new MemoryVariables()
-);
+) as MemoryVariables;
 
 const dialogueOptions = {
   variableStorage: variableStorage,
@@ -31,10 +34,16 @@ const initDialogue = fetch("YarnNodes.json")
   .then((response) => response.json())
   .then((data) => {
     if (local) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       local.runner = new local.bondage.Runner();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       local.runner.setVariableStorage(variableStorage);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       local.runner.load(data);
-      return local;
+      return local as DialogueRunner;
     } else {
       const dialogue = new DialogueRunner({
         ...dialogueOptions,
@@ -99,6 +108,91 @@ export function App() {
     dialogue,
     characters: characters.current,
   };
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+
+    const controller = new AbortController();
+
+    let gui: GUI | undefined;
+
+    fetch("project.json", { signal: controller.signal })
+      .then((response) => response.json())
+      .then((project) => {
+        if (!isProject(project)) throw new Error("Invalid project format.");
+
+        const dialogueData = {
+          script: dialogue.currentResult?.metadata.filetags?.find((tag) =>
+            tag.endsWith(".yarn")
+          ),
+          node: dialogue.currentResult?.metadata.title || "Start",
+        };
+
+        gui = new GUI({ title: "Debug" });
+
+        const dialogueFolder = gui.addFolder("Dialogue");
+        dialogueFolder
+          .add(dialogueData, "script", project.sourceScripts)
+          .onChange((value: string) => {
+            const filteredNodes = filterNodes(value);
+            dialogueFolder.controllers
+              .find((controller) => controller._name === "node")
+              ?.options(filteredNodes)
+              .setValue(filteredNodes[0]);
+          });
+        dialogueFolder
+          .add(
+            dialogueData,
+            "node",
+            dialogueData.script ? filterNodes(dialogueData.script) : []
+          )
+          .onChange((value: string) => dialogue.jump(value));
+
+        const variablesData: {
+          name: string;
+          value: ReturnType<MemoryVariables["get"]> | undefined;
+        } = {
+          name: "",
+          value: "",
+        };
+        const variablesFolder = gui.addFolder("Variables");
+        variablesFolder
+          .add(
+            variablesData,
+            "name",
+            Array.from(variableStorage._variables.keys())
+          )
+          .onChange((value: string) => {
+            variablesData.value = variableStorage.get(value);
+            variablesFolder.controllers
+              .find((controller) => controller._name === "value")
+              ?.updateDisplay();
+          });
+        variablesFolder
+          .add(variablesData, "value", undefined)
+          .onChange((value: ReturnType<MemoryVariables["get"]>) => {
+            if (variablesData.name && value)
+              variableStorage.set(variablesData.name, value);
+          });
+
+        gui.close();
+
+        function filterNodes(script: string) {
+          return Object.values<ParserNode>(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            dialogue.runner.yarnNodes
+          )
+            .filter((node) => node.filetags.find((tag) => script.endsWith(tag)))
+            .map((node) => node.title);
+        }
+      });
+
+    return () => {
+      if (gui) gui.destroy();
+      controller.abort();
+    };
+  }, [dialogue]);
 
   return (
     <>

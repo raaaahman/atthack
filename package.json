@@ -16,6 +16,7 @@
     "@tanstack/router": "^0.0.1-beta.53",
     "clsx": "^2.1.1",
     "derive-valtio": "^0.2.0",
+    "lil-gui": "^0.20.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "valtio": "^2.1.1",
