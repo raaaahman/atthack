@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = "http://localhost:4173";
+const baseURL = "http://localhost:5173";
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -73,7 +73,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "tsc -b && vite build && vite preview",
+    command: "npm run dev",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
   },

@@ -9,5 +9,9 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src/") },
   },
-  plugins: [TanStackRouterVite(), react(), vitePluginYarn()],
+  plugins: [
+    TanStackRouterVite(),
+    react(),
+    process.env.CI ? undefined : vitePluginYarn(),
+  ],
 });
