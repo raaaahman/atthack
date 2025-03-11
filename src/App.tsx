@@ -110,7 +110,7 @@ export function App() {
   };
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "development") return;
+    if (!import.meta.env.DEV) return;
 
     const controller = new AbortController();
 
