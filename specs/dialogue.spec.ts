@@ -57,6 +57,21 @@ test("Dialogue feature", async ({ context, browser }) => {
     serviceWorkers: "block",
   });
 
+  context.route("**/project.json", async (route) => {
+    await route.fulfill({
+      status: 200,
+      body: JSON.stringify({
+        version: "2",
+        sourceScripts: ["first.yarn", "second.yarn"],
+        baseLanguage: "en",
+        localization: {},
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+  });
+
   context.route("**/YarnNodes.json", async (route) => {
     await route.fulfill({
       status: 200,
