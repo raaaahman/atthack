@@ -16,7 +16,6 @@ export const router = createRouter({
   routeTree,
   history: createMemoryHistory({ initialEntries: ["/"] }),
   context: {
-    project: null,
     variables: variables,
     dialogue: null,
     characters,

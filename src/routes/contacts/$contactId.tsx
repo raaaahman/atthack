@@ -18,7 +18,7 @@ function RouteComponent() {
   return (
     <>
       <header className="fixed bg-base-100 w-full h-16 z-[5] flex justify-between md:justify-center items-center p-2">
-        <Link href="/contacts" className="block md:hidden">
+        <Link to="/contacts" className="block md:hidden">
           <span className="sr-only">Messages</span>
           <ChevronLeftIcon
             title="Other Contacts"

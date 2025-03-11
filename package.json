@@ -1,6 +1,6 @@
 {
   "name": "atthack",
-  "version": "0.6.6",
+  "version": "0.7.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,12 +11,14 @@
     "test:e2e": "playwright test --ui"
   },
   "dependencies": {
-    "@heroicons/react": "^2.1.5",
+    "@heroicons/react": "^2.2.0",
+    "@tanstack/react-router": "^1.105.0",
     "@tanstack/router": "^0.0.1-beta.53",
     "clsx": "^2.1.1",
     "derive-valtio": "^0.2.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "lil-gui": "^0.20.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "valtio": "^2.1.1",
     "yarn-bound": "^0.5.4"
   },
@@ -28,11 +30,11 @@
     "@tanstack/router-plugin": "^1.78.3",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.0.1",
+    "@testing-library/react": "^16.2.0",
     "@types/node": "^22.9.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.3",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^1.3.2",
     "autoprefixer": "^10.4.20",
     "daisyui": "^4.12.14",
     "eslint": "^9.13.0",
@@ -46,7 +48,7 @@
     "tailwindcss": "^3.4.14",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.11.0",
-    "vite": "^5.4.10",
-    "vitest": "^2.1.5"
+    "vite": "^6.2.0",
+    "vitest": "^3.0.7"
   }
 }

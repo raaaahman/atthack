@@ -28,9 +28,10 @@
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "include": [
-    "src/**/*.test.*",
-    "src/types/*",
+    "**/*.{test,spec}.*",
+    "./src/types/*",
     "./vite.config.ts",
-    "./vitest.setup.ts"
+    "./vitest.setup.ts",
+    "./dev/*"
   ]
 }

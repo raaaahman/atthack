@@ -11,7 +11,7 @@ function RouteComponent() {
   return (
     <>
       <header className="bg-base-100 h-16 flex justify-between md:justify-center items-center p-2">
-        <Link href="/" className="block md:hidden">
+        <Link to="/" className="block md:hidden">
           <ChevronLeftIcon
             title="Back Home"
             role="presentation"
@@ -40,8 +40,8 @@ function RouteComponent() {
             <button
               className="btn btn-error"
               onClick={() => {
-                window.localStorage.clear()
-                window.location.reload()
+                window.localStorage.clear();
+                window.location.reload();
               }}
             >
               Confirm
@@ -50,5 +50,5 @@ function RouteComponent() {
         </div>
       </dialog>
     </>
-  )
+  );
 }

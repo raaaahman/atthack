@@ -1,13 +1,10 @@
 import { RouterProvider } from "@tanstack/react-router";
-import YarnBound from "yarn-bound";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef } from "react";
 import { proxy } from "valtio";
 import { subscribeKey } from "valtio/utils";
+import GUI from "lil-gui";
 
 import { router } from "@/router";
-import { loadProject } from "@/queries/loadProject";
-import { ProjectContext } from "@/contexts/ProjectContext";
-import { IProject } from "@/types/IProject";
 import { VariableStorageContext } from "@/contexts/VariableStorageContext";
 import { DialogueContext } from "@/contexts/DialogueContext";
 import { CharactersContext } from "@/contexts/CharactersContext";
@@ -15,199 +12,197 @@ import { CharactersRegistry } from "@/service/CharactersRegistry";
 import { LocalStorageManager } from "@/service/LocalStorageManager";
 import { isVariables, MemoryVariables } from "@/service/MemoryVariables";
 import { DialogueRunner, isDialogueRunner } from "@/service/DialogueRunner";
+import { ParserNode } from "../dev/src/convert-yarn-to-js";
+import { isProject } from "./types/IProject";
 
 const storage = new LocalStorageManager({});
 
-export function App() {
-  const [status, setStatus] = useState<"pending" | "error" | "success">(
-    "pending"
-  );
-  const [project, setProject] = useState<IProject | null>(null);
-  const variables = useRef(
-    storage.getItem("variables", (data) =>
-      isVariables(data) ? new MemoryVariables(data) : new MemoryVariables()
-    )
-  );
-  const [dialogue, setDialogue] = useState<YarnBound | null>(null);
-  const characters = useRef(new CharactersRegistry(variables.current));
+const variableStorage = storage.getItem("variables", (data) =>
+  isVariables(data) ? new MemoryVariables(data) : new MemoryVariables()
+) as MemoryVariables;
 
-  const dialogueOptions = {
-    startAt: "Mission_Start",
-    variableStorage: variables.current,
-    combineTextAndOptionsResults: false,
-  };
+const dialogueOptions = {
+  variableStorage: variableStorage,
+  combineTextAndOptionsResults: false,
+};
 
-  const local = storage.getItem("dialogue", (data) =>
-    isDialogueRunner(data)
-      ? DialogueRunner.fromJSON(data, dialogueOptions)
-      : null
-  );
+const local = storage.getItem("dialogue", (data) =>
+  isDialogueRunner(data) ? DialogueRunner.fromJSON(data, dialogueOptions) : null
+);
 
-  const [currentScript, setCurrentScript] = useState<string | undefined>(
-    local
-      ? "scripts/" +
-          local.currentResult?.metadata.filetags.find((tag?: string) =>
-            tag?.endsWith("yarn")
-          ) || "index.yarn"
-      : undefined
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    loadProject(controller.signal)
-      .then((data) => {
-        setProject(data);
-        setCurrentScript(
-          (currentScript) => currentScript || data.sourceScripts[0]
-        );
-        setStatus("success");
-
-        return data;
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error.name !== "AbortError") setStatus("error");
+const initDialogue = fetch("YarnNodes.json")
+  .then((response) => response.json())
+  .then((data) => {
+    if (local) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      local.runner = new local.bondage.Runner();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      local.runner.setVariableStorage(variableStorage);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      local.runner.load(data);
+      return local as DialogueRunner;
+    } else {
+      const dialogue = new DialogueRunner({
+        ...dialogueOptions,
+        dialogue: data,
       });
 
-    return () => controller.abort();
-  }, []);
+      storage.setItem("dialogue", dialogue);
+      return dialogue;
+    }
+  });
+
+export function App() {
+  const variables = useRef(variableStorage);
+  const dialogue = useRef(proxy(use(initDialogue))).current;
+  const characters = useRef(new CharactersRegistry(variables.current));
 
   const endModalRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     let lastTitle = dialogue?.currentResult?.metadata.title;
 
-    if (project && dialogue) {
-      const unsubscribe = subscribeKey(dialogue, "currentResult", () => {
-        if (
-          dialogue.currentResult &&
-          "command" in dialogue.currentResult &&
-          dialogue.currentResult.command === "pause"
-        )
-          endModalRef.current?.showModal();
+    const unsubscribe = subscribeKey(dialogue, "currentResult", () => {
+      if (
+        dialogue.currentResult &&
+        "command" in dialogue.currentResult &&
+        dialogue.currentResult.command === "pause"
+      )
+        endModalRef.current?.showModal();
 
-        if (dialogue.currentResult?.metadata.title !== lastTitle) {
-          storage.saveItems();
-          lastTitle = dialogue.currentResult?.metadata.title;
-        }
-
-        if (
-          dialogue.currentResult &&
-          "command" in dialogue.currentResult &&
-          dialogue.currentResult.command.startsWith("wait")
-        ) {
-          setTimeout(
-            () => {
-              dialogue.advance();
-            },
-            parseInt(
-              dialogue.currentResult.command.match(/wait\s(\d+)/)?.at(1) || "1"
-            ) * 1000
-          );
-        }
-
-        if (!currentScript) return;
-
-        if (dialogue.currentResult?.isDialogueEnd)
-          setCurrentScript((currentScript) => {
-            const currentIndex = project.sourceScripts.findIndex(
-              (path) => path === currentScript
-            );
-
-            return currentIndex < project.sourceScripts.length - 1
-              ? project.sourceScripts[currentIndex + 1]
-              : currentScript;
-          });
-      });
+      if (dialogue.currentResult?.metadata.title !== lastTitle) {
+        storage.saveItems();
+        lastTitle = dialogue.currentResult?.metadata.title;
+      }
 
       if (
         dialogue.currentResult &&
         "command" in dialogue.currentResult &&
         dialogue.currentResult.command.startsWith("wait")
-      )
-        dialogue.advance();
-      return unsubscribe;
-    }
-  }, [project, dialogue]);
+      ) {
+        setTimeout(
+          () => {
+            dialogue.advance();
+          },
+          parseInt(
+            dialogue.currentResult.command.match(/wait\s(\d+)/)?.at(1) || "1"
+          ) * 1000
+        );
+      }
+    });
 
-  useEffect(() => {
-    if (dialogue) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      dialogue.runner = new dialogue.bondage.Runner();
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      dialogue.runner.noEscape = true;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      dialogue.runner.setVariableStorage(variables.current);
-    }
-
-    if (!dialogue && local) {
-      setDialogue(proxy(local));
-    } else if (currentScript) {
-      if (process.env.NODE_ENV === "development") console.log(dialogue);
-      const controller = new AbortController();
-
-      fetch(currentScript, { signal: controller.signal })
-        .then((response) => response.text())
-        .then((script) => {
-          if (dialogue) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            dialogue.runner.load(script);
-            dialogue.jump("Mission_Start");
-          } else {
-            const dialogue = new DialogueRunner({
-              dialogue: script,
-              ...dialogueOptions,
-            });
-
-            storage.setItem("dialogue", dialogue);
-
-            setDialogue(proxy(dialogue));
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          if (error.name !== "AbortError") setStatus("error");
-        });
-
-      return () => controller.abort();
-    }
-  }, [currentScript]);
+    if (
+      dialogue.currentResult &&
+      "command" in dialogue.currentResult &&
+      dialogue.currentResult.command.startsWith("wait")
+    )
+      dialogue.advance();
+    return unsubscribe;
+  }, []);
 
   const context = {
-    project,
     variables: variables.current,
     dialogue,
     characters: characters.current,
   };
 
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+
+    const controller = new AbortController();
+
+    let gui: GUI | undefined;
+
+    fetch("project.json", { signal: controller.signal })
+      .then((response) => response.json())
+      .then((project) => {
+        if (!isProject(project)) throw new Error("Invalid project format.");
+
+        const dialogueData = {
+          script: dialogue.currentResult?.metadata.filetags?.find((tag) =>
+            tag.endsWith(".yarn")
+          ),
+          node: dialogue.currentResult?.metadata.title || "Start",
+        };
+
+        gui = new GUI({ title: "Debug" });
+
+        const dialogueFolder = gui.addFolder("Dialogue");
+        dialogueFolder
+          .add(dialogueData, "script", project.sourceScripts)
+          .onChange((value: string) => {
+            const filteredNodes = filterNodes(value);
+            dialogueFolder.controllers
+              .find((controller) => controller._name === "node")
+              ?.options(filteredNodes)
+              .setValue(filteredNodes[0]);
+          });
+        dialogueFolder
+          .add(
+            dialogueData,
+            "node",
+            dialogueData.script ? filterNodes(dialogueData.script) : []
+          )
+          .onChange((value: string) => dialogue.jump(value));
+
+        const variablesData: {
+          name: string;
+          value: ReturnType<MemoryVariables["get"]> | undefined;
+        } = {
+          name: "",
+          value: "",
+        };
+        const variablesFolder = gui.addFolder("Variables");
+        variablesFolder
+          .add(
+            variablesData,
+            "name",
+            Array.from(variableStorage._variables.keys())
+          )
+          .onChange((value: string) => {
+            variablesData.value = variableStorage.get(value);
+            variablesFolder.controllers
+              .find((controller) => controller._name === "value")
+              ?.updateDisplay();
+          });
+        variablesFolder
+          .add(variablesData, "value", undefined)
+          .onChange((value: ReturnType<MemoryVariables["get"]>) => {
+            if (variablesData.name && value)
+              variableStorage.set(variablesData.name, value);
+          });
+
+        gui.close();
+
+        function filterNodes(script: string) {
+          return Object.values<ParserNode>(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            dialogue.runner.yarnNodes
+          )
+            .filter((node) => node.filetags.find((tag) => script.endsWith(tag)))
+            .map((node) => node.title);
+        }
+      });
+
+    return () => {
+      if (gui) gui.destroy();
+      controller.abort();
+    };
+  }, [dialogue]);
+
   return (
     <>
-      {status === "pending" ? <LoadingSpinner /> : null}
-      {status === "success" ? (
-        <ProjectContext.Provider value={project}>
-          <VariableStorageContext.Provider value={variables.current}>
-            <CharactersContext.Provider value={characters.current}>
-              {dialogue ? (
-                <DialogueContext.Provider value={dialogue}>
-                  <RouterProvider router={router} context={context} />
-                </DialogueContext.Provider>
-              ) : (
-                <LoadingSpinner />
-              )}
-            </CharactersContext.Provider>
-          </VariableStorageContext.Provider>
-        </ProjectContext.Provider>
-      ) : null}
-      {status === "error" ? (
-        <div className="h-dvh flex flex-col justify-center items-center">
-          <p>Oops. Something went wrong. Try refreshing the page.</p>
-        </div>
-      ) : null}
+      <VariableStorageContext.Provider value={variables.current}>
+        <CharactersContext.Provider value={characters.current}>
+          <DialogueContext.Provider value={dialogue}>
+            <RouterProvider router={router} context={context} />
+          </DialogueContext.Provider>
+        </CharactersContext.Provider>
+      </VariableStorageContext.Provider>
       <dialog ref={endModalRef} className="modal" role="alertdialog">
         <div className="modal-box">
           <strong className="block text-lg font-semibold">
@@ -234,10 +229,4 @@ export function App() {
   );
 }
 
-function LoadingSpinner() {
-  return (
-    <div className="h-dvh flex flex-col justify-center items-center">
-      <span className="loading-spinner"></span>
-    </div>
-  );
-}
+

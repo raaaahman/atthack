@@ -25,7 +25,7 @@ function RouteComponent() {
           <li className="py-4 text-center">
             <Notify route="/contacts" result={snap.currentResult}>
               <Link
-                href="/contacts"
+                to="/contacts"
                 className="btn btn-square btn-neutral text-neutral-content size-24 shadow-md shadow-neutral"
               >
                 <span className="sr-only">Messages</span>
@@ -36,7 +36,8 @@ function RouteComponent() {
           <li className="py-4 text-center">
             <Notify route="/ai" result={snap.currentResult}>
               <Link
-                href="/ai/flemmy"
+                to="/ai/$modelId"
+                params={{ modelId: "flemmy" }}
                 className="btn btn-square btn-neutral text-neutral-content size-24 shadow-md shadow-neutral"
               >
                 <span className="sr-only">AI Assistant</span>
@@ -46,7 +47,7 @@ function RouteComponent() {
           </li>
           <li className="py-4 text-center">
             <Link
-              href="/settings"
+              to="/settings"
               className="btn btn-square btn-neutral text-neutral-content size-24 shadow-md shadow-neutral"
             >
               <span className="sr-only">Settings</span>

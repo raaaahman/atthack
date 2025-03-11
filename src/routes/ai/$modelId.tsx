@@ -40,7 +40,7 @@ function RouteComponent() {
   return (
     <>
       <header className="fixed w-full z-[5] bg-base-100 text-base-content flex justify-between md:justify-center items-center p-2">
-        <Link href="/" className="block md:hidden">
+        <Link to="/" className="block md:hidden">
           <span className="sr-only">Back Home</span>
           <ChevronLeftIcon
             title="Back Home"
@@ -57,7 +57,7 @@ function RouteComponent() {
             <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
               {availableModels.map((model) => (
                 <li key={model} value={model} className="">
-                  <Link href={"/ai/" + model}>{characters.getName(model)}</Link>
+                  <Link to={"/ai/" + model}>{characters.getName(model)}</Link>
                 </li>
               ))}
             </ul>

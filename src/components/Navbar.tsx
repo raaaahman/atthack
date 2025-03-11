@@ -27,12 +27,16 @@ export const Navbar = () => {
         </Link>
       </Notify>
       <Notify route="/ai" result={snap.currentResult}>
-        <Link className="btn btn-square btn-neutral m-1 p-1" href="/ai/flemmy">
+        <Link
+          className="btn btn-square btn-neutral m-1 p-1"
+          to="/ai/$modelId"
+          params={{ modelId: "flemmy" }}
+        >
           <span className="sr-only">AI Assistant</span>
           <SparklesIcon title="AI Assistant" role="presentation" />
         </Link>
       </Notify>
-      <Link href="/settings" className="btn btn-square btn-neutral m-1 p-1">
+      <Link to="/settings" className="btn btn-square btn-neutral m-1 p-1">
         <span className="sr-only">Settings</span>
         <WrenchScrewdriverIcon title="Settings" role="presentation" />
       </Link>
