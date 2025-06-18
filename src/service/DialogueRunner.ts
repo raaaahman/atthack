@@ -89,4 +89,8 @@ export class DialogueRunner extends YarnBound {
           : this.currentResult,
     };
   }
+
+  constructor(options: YarnBoundOptions) {
+    super(options);
+  }
 }

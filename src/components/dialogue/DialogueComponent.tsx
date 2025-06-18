@@ -95,7 +95,7 @@ export function DialogueComponent({
 
   return (
     <div
-      className={clsx("h-full flex flex-col bg-neutral-300", className)}
+      className={clsx("h-full flex flex-col bg-base-300", className)}
       onClick={handleClick}
       {...props}
     >
