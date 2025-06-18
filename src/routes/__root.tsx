@@ -22,7 +22,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
   component: Component,
 });
 
-function Component() {
+export function Component() {
   const { pathname } = useLocation();
 
   return (

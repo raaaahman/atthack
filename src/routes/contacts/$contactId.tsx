@@ -10,7 +10,7 @@ export const Route = createFileRoute("/contacts/$contactId")({
   component: RouteComponent,
 });
 
-function RouteComponent() {
+export function RouteComponent() {
   const { contactId } = useParams({ from: "/contacts/$contactId" });
   const { state, advance } = useDialogue({ screen: SCREEN_PREFIX + contactId });
   const characters = useCharacters();
