@@ -8,7 +8,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:e2e": "playwright test --ui"
+    "test:e2e": "playwright test --ui",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -25,6 +27,8 @@
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@playwright/test": "^1.49.0",
+    "@storybook/addon-themes": "^9.0.8",
+    "@storybook/react-vite": "^9.0.8",
     "@tanstack/eslint-plugin-router": "^1.77.7",
     "@tanstack/router-devtools": "^1.78.3",
     "@tanstack/router-plugin": "^1.78.3",
@@ -40,11 +44,13 @@
     "eslint": "^9.13.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
+    "eslint-plugin-storybook": "^9.0.8",
     "globals": "^15.11.0",
     "jsdom": "^25.0.1",
     "msw": "^2.6.6",
     "playwright": "^1.49.0",
     "postcss": "^8.4.47",
+    "storybook": "^9.0.8",
     "tailwindcss": "^3.4.14",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.11.0",
