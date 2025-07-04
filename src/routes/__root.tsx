@@ -4,18 +4,21 @@ import {
   useLocation,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import YarnBound, { IVariablesStorage } from "yarn-bound";
+import { IVariablesStorage } from "yarn-bound";
 
 import { CharactersRegistry } from "@/service/CharactersRegistry";
 import { NotificationsCenter } from "@/components/notifications/NotificationsCenter";
 import { screenName } from "@/utils";
 import { Navbar } from "@/components/Navbar";
 import clsx from "clsx";
+import { DialogueRunner } from "@/service/DialogueRunner";
+import { PostRegistry } from "@/service/Social/PostRegistry";
 
 interface RootContext {
   variables: IVariablesStorage;
-  dialogue: YarnBound | null;
+  dialogue: DialogueRunner;
   characters: CharactersRegistry;
+  posts: PostRegistry;
 }
 
 export const Route = createRootRouteWithContext<RootContext>()({

@@ -14,6 +14,7 @@ import { isVariables, MemoryVariables } from "@/service/MemoryVariables";
 import { DialogueRunner, isDialogueRunner } from "@/service/DialogueRunner";
 import { ParserNode } from "../dev/src/convert-yarn-to-js";
 import { isProject } from "./types/IProject";
+import { PostRegistry } from "./service/Social/PostRegistry";
 
 const storage = new LocalStorageManager({});
 
@@ -107,6 +108,7 @@ export function App() {
     variables: variables.current,
     dialogue,
     characters: characters.current,
+    posts: new PostRegistry(dialogue),
   };
 
   useEffect(() => {

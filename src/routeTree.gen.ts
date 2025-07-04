@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as IndexImport } from './routes/index'
+import { Route as SocialIndexImport } from './routes/social/index'
 import { Route as ContactsIndexImport } from './routes/contacts/index'
 import { Route as ContactsContactIdImport } from './routes/contacts/$contactId'
 import { Route as AiModelIdImport } from './routes/ai/$modelId'
@@ -28,6 +29,12 @@ const SettingsRoute = SettingsImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SocialIndexRoute = SocialIndexImport.update({
+  id: '/social/',
+  path: '/social/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -88,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactsIndexImport
       parentRoute: typeof rootRoute
     }
+    '/social/': {
+      id: '/social/'
+      path: '/social'
+      fullPath: '/social'
+      preLoaderRoute: typeof SocialIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -99,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/ai/$modelId': typeof AiModelIdRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts': typeof ContactsIndexRoute
+  '/social': typeof SocialIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -107,6 +122,7 @@ export interface FileRoutesByTo {
   '/ai/$modelId': typeof AiModelIdRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts': typeof ContactsIndexRoute
+  '/social': typeof SocialIndexRoute
 }
 
 export interface FileRoutesById {
@@ -116,6 +132,7 @@ export interface FileRoutesById {
   '/ai/$modelId': typeof AiModelIdRoute
   '/contacts/$contactId': typeof ContactsContactIdRoute
   '/contacts/': typeof ContactsIndexRoute
+  '/social/': typeof SocialIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -126,8 +143,15 @@ export interface FileRouteTypes {
     | '/ai/$modelId'
     | '/contacts/$contactId'
     | '/contacts'
+    | '/social'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/settings' | '/ai/$modelId' | '/contacts/$contactId' | '/contacts'
+  to:
+    | '/'
+    | '/settings'
+    | '/ai/$modelId'
+    | '/contacts/$contactId'
+    | '/contacts'
+    | '/social'
   id:
     | '__root__'
     | '/'
@@ -135,6 +159,7 @@ export interface FileRouteTypes {
     | '/ai/$modelId'
     | '/contacts/$contactId'
     | '/contacts/'
+    | '/social/'
   fileRoutesById: FileRoutesById
 }
 
@@ -144,6 +169,7 @@ export interface RootRouteChildren {
   AiModelIdRoute: typeof AiModelIdRoute
   ContactsContactIdRoute: typeof ContactsContactIdRoute
   ContactsIndexRoute: typeof ContactsIndexRoute
+  SocialIndexRoute: typeof SocialIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -152,6 +178,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiModelIdRoute: AiModelIdRoute,
   ContactsContactIdRoute: ContactsContactIdRoute,
   ContactsIndexRoute: ContactsIndexRoute,
+  SocialIndexRoute: SocialIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -168,7 +195,8 @@ export const routeTree = rootRoute
         "/settings",
         "/ai/$modelId",
         "/contacts/$contactId",
-        "/contacts/"
+        "/contacts/",
+        "/social/"
       ]
     },
     "/": {
@@ -185,6 +213,9 @@ export const routeTree = rootRoute
     },
     "/contacts/": {
       "filePath": "contacts/index.tsx"
+    },
+    "/social/": {
+      "filePath": "social/index.tsx"
     }
   }
 }

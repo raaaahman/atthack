@@ -1,52 +1,19 @@
 import { Avatar } from "@/components/Avatar";
 import { PLAYER_ID } from "@/constants";
-import Social from "@/types/Social";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/social/")({
   loader: async ({ context }) => {
-    const response = await fetch("/social.json");
-    const data: Social = await response.json();
+    const posts = await context.posts.findByFriends(PLAYER_ID);
 
-    return data.users
-      .filter(
-        (user) => user.id === PLAYER_ID || user.friends.includes(PLAYER_ID)
-      )
-      .flatMap((user) =>
-        user.posts.map((post) => ({
-          ...post,
-          userId: user.id,
-          username: user.name,
-          useravatar: user.avatar,
-          date: new Date(parseInt(post.timestamp.toString())),
-          comments: post.comments.map((comment) => ({
-            ...comment,
-            date: new Date(parseInt(comment.timestamp.toString())),
-          })),
-        }))
-      )
-      .filter((post) =>
-        post.conditions.reduce(
-          (final, condition) =>
-            final &&
-            new Function(
-              '"use strict"; const [ visited ] = arguments; return (' +
-                condition +
-                ")"
-            )(
-              (nodeName: string) =>
-                !!context.dialogue?.history.find(
-                  (node) => node.metadata.title === nodeName
-                )
-            ),
-          true
-        )
-      )
+    return posts
+      .filter(context.posts.validate.bind(context.posts))
       .sort((a, b) => b.timestamp - a.timestamp);
   },
   component: RouteComponent,
 });
+
 
 function RouteComponent() {
   const posts = useLoaderData({ from: "/social/" });
