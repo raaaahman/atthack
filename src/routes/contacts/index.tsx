@@ -2,12 +2,10 @@ import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 import { SCREEN_PREFIX } from "./-constants";
 import { CommandResult, OptionsResult, TextResult } from "yarn-bound";
 import { useDialogue } from "@/contexts/DialogueContext";
-import {
-  ChatBubbleOvalLeftIcon,
-  ChevronLeftIcon,
-} from "@heroicons/react/24/outline";
+import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "@/components/Avatar";
 import { PLAYER_ID } from "@/constants";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 type Contact = {
   id: string;
@@ -74,49 +72,51 @@ function RouteComponent() {
         </h1>
         <div className="w-12 md:hidden" />
       </header>
-      <ul className="container mx-auto bg-neutral-300 px-4 flex-grow mt-16">
-        {data.map(({ id, name, role }) => (
-          <li
-            key={id}
-            className="flex flex-row justify-between rounded-full shadow-md my-2 p-2 bg-neutral-100"
-          >
-            <Avatar characterId={id} />
-            <div className="flex-grow text-start px-1">
-              <p className="font-semibold">{name}</p>
-              <p className="font-light">{role}</p>
-            </div>
-            <div className="indicator">
-              {state.currentResult?.metadata.screen.slice(
-                SCREEN_PREFIX.length
-              ) === id &&
-              !("options" in state.currentResult) &&
-              !("command" in state.currentResult) &&
-              !state.currentResult?.markup?.find(
-                (tag) =>
-                  tag.name === "character" &&
-                  tag.properties.name.toLowerCase() === PLAYER_ID
-              ) ? (
-                <span className="indicator-item badge badge-secondary text-secondary-content">
-                  1
-                </span>
-              ) : null}
-              <Link
-                to={`/contacts/$contactId`}
-                params={{ contactId: id }}
-                title={`Chat with ${name}`}
-                className="btn btn-circle btn-primary p-1 size-12"
-              >
-                <span className="sr-only">Chat with {name}</span>
-                <ChatBubbleOvalLeftIcon
-                  role="presentation"
-                  title="Chat"
-                  className=""
-                />
-              </Link>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <main className="bg-neutral-300 px-4 flex-grow mt-16">
+        <ul className="container mx-auto ">
+          {data.map(({ id, name, role }) => (
+            <li
+              key={id}
+              className="flex flex-row justify-between rounded-full shadow-md my-2 p-2 bg-neutral-100"
+            >
+              <Avatar characterId={id} />
+              <div className="flex-grow text-start px-1">
+                <p className="font-semibold">{name}</p>
+                <p className="font-light">{role}</p>
+              </div>
+              <div className="indicator">
+                {state.currentResult?.metadata.screen.slice(
+                  SCREEN_PREFIX.length
+                ) === id &&
+                !("options" in state.currentResult) &&
+                !("command" in state.currentResult) &&
+                !state.currentResult?.markup?.find(
+                  (tag) =>
+                    tag.name === "character" &&
+                    tag.properties.name.toLowerCase() === PLAYER_ID
+                ) ? (
+                  <span className="indicator-item badge badge-secondary text-secondary-content">
+                    1
+                  </span>
+                ) : null}
+                <Link
+                  to={`/contacts/$contactId`}
+                  params={{ contactId: id }}
+                  title={`Chat with ${name}`}
+                  className="btn btn-circle btn-primary p-1 size-12"
+                >
+                  <span className="sr-only">Chat with {name}</span>
+                  <ChatBubbleOvalLeftIcon
+                    role="presentation"
+                    title="Chat"
+                    className=""
+                  />
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </main>
     </>
   );
 }

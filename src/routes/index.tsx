@@ -6,6 +6,7 @@ import WrenchScrewdriverIcon from "@heroicons/react/24/outline/WrenchScrewdriver
 
 import { useDialogue } from "@/contexts/DialogueContext";
 import { Notify } from "@/components/notifications/Notify";
+import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -32,6 +33,15 @@ function RouteComponent() {
                 <ChatBubbleOvalLeftIcon title="Messages" role="presentation" />
               </Link>
             </Notify>
+          </li>
+          <li className="py-4 text-center">
+            <Link
+              to="/social"
+              className="btn btn-square btn-neutral text-neutral-content size-24 shadow-md shadow-neutral"
+            >
+              <span className="sr-only">Social network</span>
+              <UserGroupIcon title="Social network" role="presentation" />
+            </Link>
           </li>
           <li className="py-4 text-center">
             <Notify route="/ai" result={snap.currentResult}>
